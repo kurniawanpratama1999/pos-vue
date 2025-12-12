@@ -16,8 +16,10 @@ const listClassName = computed<string>(() => {
 
 <template>
   <div class="space-y-1">
-    <div @click="handleItem">
-      <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-x-1">
+    <div @click="handleItem" class="cursor-pointer">
+      <h3
+        class="text-lg font-bold text-emerald-400 flex items-center gap-x-1 hover:underline"
+      >
         <slot name="trigger"></slot>
         <Icon
           icon="icon-park-solid:down-one"
@@ -25,7 +27,13 @@ const listClassName = computed<string>(() => {
         />
       </h3>
     </div>
-    <div :class="['pl-3 gap-y-1', listClassName, 'overflow-hidden']">
+    <div
+      :class="[
+        'pl-3 gap-y-1',
+        listClassName,
+        'overflow-hidden border-l border-emerald-500',
+      ]"
+    >
       <slot name="items"></slot>
     </div>
   </div>

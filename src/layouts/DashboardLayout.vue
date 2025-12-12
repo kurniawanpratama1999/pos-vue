@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { computed, ref } from "vue";
+import Dropdown from "../components/Dropdown.vue";
 
 const isAsideActive = ref<boolean>(false);
 const handleAside = (): void => {
@@ -9,12 +10,23 @@ const handleAside = (): void => {
 const asideClassName = computed<string>(() => {
   return isAsideActive.value ? "left-0" : "-left-(--container-3xs) lg:left-0";
 });
+const backdropClassName = computed(() => {
+  return isAsideActive.value ? "fixed lg:hidden" : "hidden";
+});
 </script>
 
 <template>
-  <div class="bg-neutral-800 text-neutral-200 min-h-screen relative">
+  <div class="bg-neutral-900 text-neutral-200 min-h-screen relative">
+    <div
+      @click="handleAside"
+      :class="[
+        backdropClassName,
+        'backdrop top-0 left-0 right-0 bottom-0 backdrop-blur bg-black/5 z-100',
+      ]"
+    ></div>
+
     <header
-      class="bg-neutral-700 h-14 grid grid-cols-[300px_1fr] lg:grid-cols-[300px_1fr_300px] items-center px-4"
+      class="bg-neutral-900 sticky top-0 h-14 border-b border-neutral-700 grid grid-cols-[300px_1fr] lg:grid-cols-[300px_1fr_300px] items-center px-4"
     >
       <div class="flex flex-row justify-start items-center gap-3">
         <h1
@@ -51,12 +63,12 @@ const asideClassName = computed<string>(() => {
     </header>
     <aside
       :class="[
-        'fixed top-14 w-3xs bottom-0 bg-neutral-600 transition-all',
+        'fixed z-101 top-0 lg:top-14 w-3xs bottom-0 bg-neutral-900 transition-all border-r border-neutral-700',
         'space-y-5 px-3 py-3 overflow-y-auto',
         asideClassName,
       ]"
     >
-      <dropdown :is-close="true">
+      <Dropdown :is-close="true">
         <template #trigger>Master Data</template>
         <template #items>
           <a href="#">User</a>
@@ -64,46 +76,46 @@ const asideClassName = computed<string>(() => {
           <a href="#">Anchor</a>
           <a href="#">Permission</a>
         </template>
-      </dropdown>
+      </Dropdown>
 
-      <dropdown>
+      <Dropdown :is-close="false">
         <template #trigger>General Data</template>
         <template #items>
           <a href="#">Category</a>
           <a href="#">Product</a>
           <a href="#">Variant</a>
         </template>
-      </dropdown>
+      </Dropdown>
 
-      <dropdown>
+      <Dropdown :is-close="false">
         <template #trigger>Transaction</template>
         <template #items>
           <a href="#">Order</a>
           <a href="#">Order Detail</a>
           <a href="#">Report</a>
         </template>
-      </dropdown>
+      </Dropdown>
 
-      <dropdown>
+      <Dropdown :is-close="false">
         <template #trigger>Readable</template>
         <template #items>
           <a href="#">Usage</a>
           <a href="#">Api Reference</a>
           <a href="#">Author</a>
         </template>
-      </dropdown>
+      </Dropdown>
 
-      <dropdown>
+      <Dropdown :is-close="false">
         <template #trigger>Profile</template>
         <template #items>
           <a href="#">Kurniawan Pratama</a>
           <a href="#">Schedule</a>
           <a href="#">Logout</a>
         </template>
-      </dropdown>
+      </Dropdown>
     </aside>
     <main
-      class="p-3 text-neutral-100 lg:relative left-(--container-3xs) w-[calc(100vw-var(--container-3xs))]"
+      class="p-3 h-[200vh] text-neutral-100 lg:relative left-(--container-3xs) w-[calc(100vw-var(--container-3xs))]"
     >
       <router-view />
     </main>
