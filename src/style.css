@@ -2,3 +2,7 @@
 html {
   background-color: var(--color-neutral-900);
 }
+
+button {
+  cursor: pointer;
+}

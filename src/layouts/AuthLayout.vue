@@ -4,14 +4,17 @@ import { computed, ref } from "vue";
 import Dropdown from "../components/Dropdown.vue";
 
 const isAsideActive = ref<boolean>(false);
+
 const handleAside = (): void => {
   isAsideActive.value = !isAsideActive.value;
 };
+
 const asideClassName = computed<string>(() => {
   return isAsideActive.value
     ? "left-0 lg:hidden"
     : "-left-(--container-3xs) lg:left-0 lg:hidden";
 });
+
 const backdropClassName = computed(() => {
   return isAsideActive.value ? "fixed lg:hidden" : "hidden";
 });
