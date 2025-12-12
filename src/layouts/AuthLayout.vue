@@ -28,7 +28,7 @@ const backdropClassName = computed(() => {
     ></div>
 
     <header
-      class="bg-neutral-900 sticky top-0 h-14 border-b border-neutral-700 grid grid-cols-[300px_1fr] lg:grid-cols-[300px_1fr_300px] items-center px-4"
+      class="bg-neutral-900 fixed top-0 z-99 w-full h-14 border-b border-neutral-700 flex max-lg:justify-between lg:grid lg:grid-cols-[300px_1fr_300px] items-center px-4"
     >
       <div class="flex flex-row justify-start items-center gap-3">
         <h1

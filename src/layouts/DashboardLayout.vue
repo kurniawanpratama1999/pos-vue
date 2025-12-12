@@ -16,7 +16,9 @@ const backdropClassName = computed(() => {
 </script>
 
 <template>
-  <div class="bg-neutral-900 text-neutral-200 min-h-screen relative">
+  <div
+    class="bg-neutral-900 text-neutral-200 w-dvw min-h-dvh relative overflow-x-hidden"
+  >
     <div
       @click="handleAside"
       :class="[
@@ -26,7 +28,8 @@ const backdropClassName = computed(() => {
     ></div>
 
     <header
-      class="bg-neutral-900 sticky top-0 h-14 border-b border-neutral-700 grid grid-cols-[300px_1fr] lg:grid-cols-[300px_1fr_300px] items-center px-4"
+      style="position: -webkit-sticky"
+      class="bg-neutral-900 fixed top-0 z-99 w-full h-14 border-b border-neutral-700 flex max-lg:justify-between lg:grid lg:grid-cols-[300px_1fr_300px] items-center px-4"
     >
       <div class="flex flex-row justify-start items-center gap-3">
         <h1
@@ -115,7 +118,7 @@ const backdropClassName = computed(() => {
       </Dropdown>
     </aside>
     <main
-      class="p-3 h-[200vh] text-neutral-100 lg:relative left-(--container-3xs) w-[calc(100vw-var(--container-3xs))]"
+      class="p-3 h-[200vh] pt-14 text-neutral-100 static lg:relative left-(--container-3xs) lg:w-[calc(100dvw-var(--container-3xs))]"
     >
       <router-view />
     </main>
