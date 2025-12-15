@@ -27,10 +27,100 @@ onMounted(async () => {
     users.value = response.data;
   }
 });
+
+// TOGGLE FOR ADD USER
+const modalFormIsActive = ref(false);
+const toggleModalForm = () => {
+  modalFormIsActive.value = !modalFormIsActive.value;
+};
 </script>
 
 <template>
-  <section>
+  <section
+    id="modal"
+    :class="[
+      modalFormIsActive ? 'flex' : 'hidden',
+      'fixed top-0 left-0 right-0 bottom-0 bg-white/3 backdrop-blur z-200',
+      'items-center justify-center',
+    ]"
+  >
+    <div
+      class="w-full max-w-sm p-5 bg-neutral-800 border border-neutral-400 rounded-xl"
+    >
+      <h3 class="text-2xl text-center font-bold mb-5">Insert New user</h3>
+      <form action="" class="space-y-4 w-full mx-auto">
+        <div class="w-full">
+          <label for="name" class="block">Full Name</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            class="py-2 w-full border rounded px-3 border-neutral-500 outline-0 focus:border-neutral-400"
+            required
+          />
+        </div>
+        <div class="w-full">
+          <label for="roleId" class="block">Role Name</label>
+          <input
+            type="text"
+            name="roleId"
+            id="roleId"
+            class="py-2 w-full border rounded px-3 border-neutral-500 outline-0 focus:border-neutral-400"
+            required
+          />
+        </div>
+        <div class="w-full">
+          <label for="email" class="block">Email Address</label>
+          <input
+            type="text"
+            name="email"
+            id="email"
+            class="py-2 w-full border rounded px-3 border-neutral-500 outline-0 focus:border-neutral-400"
+            required
+          />
+        </div>
+        <div class="w-full">
+          <label for="password" class="block">Password</label>
+          <input
+            type="text"
+            name="password"
+            id="password"
+            class="py-2 w-full border rounded px-3 border-neutral-500 outline-0 focus:border-neutral-400"
+            required
+          />
+        </div>
+        <div class="w-full">
+          <label for="password_confirmation" class="block"
+            >Password Confirmation</label
+          >
+          <input
+            type="text"
+            name="password_confirmation"
+            id="password_confirmation"
+            class="py-2 w-full border rounded px-3 border-neutral-500 outline-0 focus:border-neutral-400"
+            required
+          />
+        </div>
+
+        <div class="flex gap-4 items-center justify-end">
+          <button
+            @click="toggleModalForm"
+            class="px-3 py-2 rounded flex items-center justify-center gap-1"
+          >
+            <span>Cancel</span>
+          </button>
+          <button
+            class="px-3 py-2 rounded bg-emerald-400 flex items-center justify-center gap-1"
+          >
+            <Icon icon="material-symbols:save" />
+            <span>Save</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="data-table">
     <div :class="['card']">
       <div
         :class="['card-header', 'flex items-center justify-between', 'py-2']"
@@ -56,7 +146,10 @@ onMounted(async () => {
           />
         </div>
         <div>
-          <button class="px-5 py-2 rounded bg-emerald-600">
+          <button
+            @click="toggleModalForm"
+            class="px-5 py-2 rounded bg-emerald-600"
+          >
             <Icon icon="fluent-emoji-high-contrast:plus" />
           </button>
         </div>

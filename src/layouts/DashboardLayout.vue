@@ -28,8 +28,7 @@ const backdropClassName = computed(() => {
     ></div>
 
     <header
-      style="position: -webkit-sticky"
-      class="bg-neutral-900 fixed top-0 z-99 w-full h-14 border-b border-neutral-700 flex max-lg:justify-between lg:grid lg:grid-cols-[300px_1fr_300px] items-center px-4"
+      class="bg-neutral-900 fixed top-0 z-99 w-full h-14 border-b border-neutral-700 flex max-lg:justify-between lg:grid lg:grid-cols-[calc(var(--container-3xs)+10rem)_1fr_10rem] items-center px-4"
     >
       <div class="flex flex-row justify-start items-center gap-3">
         <h1
