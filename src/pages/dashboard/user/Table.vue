@@ -33,9 +33,13 @@ onMounted(async () => {
 
 <template>
   <section class="py-5">
-    <Card main-class-name="border-0" header-class-name="px-2">
+    <Card
+      content-class-name="overflow-x-auto"
+      main-class-name="border-0"
+      header-class-name="px-2"
+    >
       <template #card-header>
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-4">
           <label
             for="search"
             class="flex items-center gap-1 px-3 border border-neutral-400 rounded-full w-full max-w-sm"
@@ -70,22 +74,35 @@ onMounted(async () => {
           <template
             #table-body="{ item, index }: { item: User, index: number }"
           >
-            <td>{{ index + 1 }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.role.name }}</td>
-            <td>{{ item.email }}</td>
-            <td>{{ item.created_at }}</td>
-            <td>
-              <div class="flex items-center gap-3">
-                <button class="px-3 py-2 rounded bg-red-400">
-                  <Icon icon="mdi:delete" />
-                </button>
-                <RouterLink
-                  class="px-3 py-2 rounded bg-blue-400"
-                  :to="{ name: 'user.show', params: { id: item.id } }"
-                >
-                  <Icon icon="mdi:pencil" />
-                </RouterLink>
+            <td data-col="No" class="grid-cols-[calc(13*10px)_1fr]">
+              <div><span class="lg:hidden">:</span> {{ index + 1 }}</div>
+            </td>
+            <td data-col="Full Name" class="grid-cols-[calc(13*10px)_1fr]">
+              <div><span class="lg:hidden">:</span> {{ item.name }}</div>
+            </td>
+            <td data-col="Role Name" class="grid-cols-[calc(13*10px)_1fr]">
+              <div><span class="lg:hidden">:</span> {{ item.role.name }}</div>
+            </td>
+            <td data-col="Email Address" class="grid-cols-[calc(13*10px)_1fr]">
+              <div><span class="lg:hidden">:</span> {{ item.email }}</div>
+            </td>
+            <td data-col="Date Create" class="grid-cols-[calc(13*10px)_1fr]">
+              <div><span class="lg:hidden">:</span> {{ item.created_at }}</div>
+            </td>
+            <td data-col="Actions" class="grid-cols-[calc(13*10px)_1fr]">
+              <div class="flex gap-1">
+                <span class="lg:hidden">:</span>
+                <div class="flex items-center gap-3">
+                  <button class="px-3 py-2 rounded bg-red-400">
+                    <Icon icon="mdi:delete" />
+                  </button>
+                  <RouterLink
+                    class="px-3 py-2 rounded bg-blue-400"
+                    :to="{ name: 'user.show', params: { id: item.id } }"
+                  >
+                    <Icon icon="mdi:pencil" />
+                  </RouterLink>
+                </div>
               </div>
             </td>
           </template>

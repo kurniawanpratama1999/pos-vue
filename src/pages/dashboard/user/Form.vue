@@ -1,116 +1,247 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { onMounted, reactive } from "vue";
-import { useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
+import FormInput from "../../../components/FormInput.vue";
+import FormSelect from "../../../components/FormSelect.vue";
 
-interface UserData {
+interface Role {
   id?: number;
-  role?: { name: string };
+  name?: string;
+}
+
+interface UserById {
+  role?: Role;
+  roleId?: number;
   name?: string;
   email?: string;
 }
 
-interface User {
-  success?: boolean;
-  data?: UserData;
+interface DataUserById {
+  success: boolean;
+  loading: boolean;
+  data: UserById;
 }
 
-const router = useRoute();
-const id = router.params.id;
-const user = reactive<User>({
+interface DataRoles {
+  success: boolean;
+  loading: boolean;
+  data: Role[];
+}
+
+interface SendData {
+  name: string;
+  roleId: number | null;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+const route = useRoute();
+const router = useRouter();
+const id = route.params.id as string;
+
+const dataUserById = reactive<DataUserById>({
   success: false,
+  loading: true,
   data: {},
 });
 
+const dataRoles = reactive<DataRoles>({
+  success: false,
+  loading: true,
+  data: [],
+});
+
+const sendData = reactive<SendData>({
+  name: "",
+  roleId: null,
+  email: "",
+  password: "",
+  password_confirmation: "",
+});
+
 onMounted(() => {
-  const hitApi = async () => {
-    const api = `http://localhost:3000/api/v1/user/${id}`;
-    const fetchUser = await fetch(api, {
-      method: "get",
-      headers: {
-        "x-current-url": window.location.pathname,
-      },
-    });
+  const HitApiUserById = async () => {
+    try {
+      const api = `http://localhost:3000/api/v1/user/${id}`;
+      const fetchUser = await fetch(api, {
+        method: "get",
+        headers: {
+          "x-current-url": window.location.pathname,
+        },
+      });
 
-    const response = await fetchUser.json();
+      if (!fetchUser.ok) {
+        throw new Error("Fetch user is not ok");
+      }
 
-    if (response.success) {
-      user.data = response.data;
-    } else {
-      console.log(response);
+      const response = await fetchUser.json();
+
+      if (!response.success) {
+        throw new Error("response for fetching user is failed");
+      }
+
+      dataUserById.success = true;
+      dataUserById.data = response.data;
+      const { name, email, roleId } = dataUserById.data;
+
+      Object.assign(sendData, {
+        name,
+        email,
+        roleId,
+      });
+    } catch (error) {
+      dataUserById.success = false;
+    } finally {
+      dataUserById.loading = false;
+    }
+  };
+
+  const HitApiRole = async () => {
+    try {
+      const api = `http://localhost:3000/api/v1/role`;
+      const fetchRoles = await fetch(api, {
+        method: "get",
+        headers: {
+          "x-current-url": window.location.pathname,
+        },
+      });
+
+      const response = await fetchRoles.json();
+
+      if (!response.success) {
+        throw new Error("response for fetching roles is failed");
+      }
+
+      dataRoles.success = true;
+      dataRoles.data = response.data;
+    } catch (error: any) {
+      console.log(error.message);
+      dataRoles.success = false;
+    } finally {
+      dataRoles.loading = false;
     }
   };
 
   if (id) {
-    hitApi();
+    HitApiUserById();
   }
+
+  HitApiRole();
 });
+
+const createUser = async () => {
+  try {
+    const apiCreateUser = "http://localhost:3000/api/v1/user";
+    const hitApiCreateUser = await fetch(apiCreateUser, {
+      credentials: "include",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-current-url": window.location.pathname,
+      },
+      body: JSON.stringify(sendData),
+    });
+
+    const response = await hitApiCreateUser.json();
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateUser = async () => {
+  try {
+    const apiUpdateUser = `http://localhost:3000/api/v1/user/${id}`;
+    let results;
+    if (sendData.password == "" || sendData.password_confirmation == "") {
+      const { password, password_confirmation, ...data } = sendData;
+      results = data;
+    } else {
+      results = sendData;
+    }
+    const hitApiUpdateUser = await fetch(apiUpdateUser, {
+      credentials: "include",
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-current-url": window.location.pathname,
+      },
+      body: JSON.stringify(results),
+    });
+
+    const response = await hitApiUpdateUser.json();
+    if (response.success) {
+      router.push({ name: "user.index" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleSubmit = () => {
+  console.log({ ...sendData });
+
+  if (id) {
+    updateUser();
+  } else {
+    createUser();
+  }
+};
 </script>
 
 <template>
   <section class="w-full max-w-sm mx-auto space-y-6 pt-5">
     <h3 v-if="!id" class="text-3xl font-bold">Form Insert New User</h3>
     <h3 v-if="id" class="text-3xl font-bold">
-      Update User {{ user.data?.name }}
+      Update User {{ dataUserById.data?.name }}
     </h3>
     <form class="space-y-4 w-full max-w-sm">
-      <div class="w-full space-y-1">
-        <label class="block" for="name">Full Name</label>
-        <input
-          class="px-3 py-2 border border-neutral-500 outline-0 rounded w-full"
-          type="text"
-          name="name"
-          id="name"
-          :value="user.data?.name"
-        />
-      </div>
+      <FormInput
+        id-name="name"
+        label="Full Name"
+        v-model="sendData.name"
+        :required="true"
+      />
 
-      <div class="w-full space-y-1">
-        <label class="block" for="roleId">Role Name</label>
-        <input
-          class="px-3 py-2 border border-neutral-500 outline-0 rounded w-full"
-          type="text"
-          name="roleId"
-          id="roleId"
-          :value="user.data?.role?.name"
-        />
-      </div>
+      <FormSelect
+        id-name="roleId"
+        label="Role Name"
+        :items="dataRoles.data"
+        v-model="sendData.roleId"
+        :required="true"
+      />
 
-      <div class="w-full space-y-1">
-        <label class="block" for="email">Email Address</label>
-        <input
-          class="px-3 py-2 border border-neutral-500 outline-0 rounded w-full"
-          type="email"
-          name="email"
-          id="email"
-          :value="user.data?.email"
-        />
-      </div>
+      <FormInput
+        id-name="email"
+        label="Email Address"
+        type="email"
+        v-model="sendData.email"
+        :required="true"
+      />
 
-      <div class="w-full space-y-1">
-        <label class="block" for="password">Password</label>
-        <input
-          class="px-3 py-2 border border-neutral-500 outline-0 rounded w-full"
-          type="password"
-          name="password"
-          id="password"
-        />
-      </div>
+      <FormInput
+        id-name="password"
+        label="Password"
+        type="password"
+        v-model="sendData.password"
+        :required="!id"
+      />
 
-      <div class="w-full space-y-1">
-        <label class="block" for="password_confirmation"
-          >Password Confirmation</label
-        >
-        <input
-          class="px-3 py-2 border border-neutral-500 outline-0 rounded w-full"
-          type="password"
-          name="password_confirmation"
-          id="password_confirmation"
-        />
-      </div>
+      <FormInput
+        id-name="password_confirmation"
+        label="Password Confirmation"
+        type="password"
+        v-model="sendData.password_confirmation"
+        :required="!id"
+      />
 
       <div class="flex items-center gap-2">
-        <button class="flex items-center gap-1 bg-red-400 px-3 py-1 rounded">
+        <button
+          type="button"
+          class="flex items-center gap-1 bg-red-400 px-3 py-1 rounded"
+        >
           <Icon icon="material-symbols:delete" />
           <span>Delete</span>
         </button>
@@ -118,6 +249,8 @@ onMounted(() => {
           <span>Cancel</span>
         </RouterLink>
         <button
+          type="button"
+          @click="handleSubmit"
           class="flex items-center gap-1 bg-emerald-400 rounded px-3 py-1"
         >
           <Icon icon="material-symbols:save" />
