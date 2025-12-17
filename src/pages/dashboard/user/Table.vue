@@ -4,6 +4,7 @@ import { ref, onMounted } from "vue";
 import Card from "../../../components/Card.vue";
 import FormTable from "../../../components/FormTable.vue";
 import { RouterLink } from "vue-router";
+import Modal from "../../../components/Modal.vue";
 
 const API_HOST = "http://localhost:3000/api/v1";
 const API_USER = API_HOST + "/user";
@@ -29,9 +30,39 @@ onMounted(async () => {
     users.value = response.data;
   }
 });
+
+const idDelete = ref<number>();
+const modalActived = ref<boolean>(false);
+const handleDelete = (id: number) => {
+  idDelete.value = id;
+  modalActived.value = true;
+};
+
+const modalHandleDelete = (id: number) => {
+  console.log(id);
+};
 </script>
 
 <template>
+  <Modal
+    @close="modalActived = false"
+    :is-active="modalActived"
+    id-name="asking-for-delete"
+    :message="`Are you sure wanna delete the id-${idDelete}?`"
+    type="default"
+    :button="[
+      {
+        text: 'Cancel',
+        variant: 'light',
+        handleClick: () => {},
+      },
+      {
+        text: 'Delete',
+        variant: 'red',
+        handleClick: () => modalHandleDelete(idDelete ?? 0),
+      },
+    ]"
+  />
   <section class="py-5">
     <Card
       content-class-name="overflow-x-auto"
@@ -93,7 +124,10 @@ onMounted(async () => {
               <div class="flex gap-1">
                 <span class="lg:hidden">:</span>
                 <div class="flex items-center gap-3">
-                  <button class="px-3 py-2 rounded bg-red-400">
+                  <button
+                    class="px-3 py-2 rounded bg-red-400"
+                    @click="handleDelete(item.id)"
+                  >
                     <Icon icon="mdi:delete" />
                   </button>
                   <RouterLink
