@@ -1,19 +1,23 @@
-<script setup lang="ts">
-interface Button {
+<script lang="ts">
+export interface Button {
   text: "Cancel" | "Ok" | "Delete" | "Approve";
   variant: "red" | "blue" | "green" | "yellow" | "light" | "dark";
   handleClick: () => void | Promise<void>;
   className?: string;
 }
 
-interface Props {
+export type Type = "success" | "warning" | "danger" | "default" | "info";
+
+export interface Props {
   idName: string;
   message: string;
   button: Button[];
-  type: "success" | "warning" | "danger" | "default" | "info";
+  type: Type;
   isActive: boolean;
 }
+</script>
 
+<script setup lang="ts">
 const buttonVariant = {
   red: "text-red-50 bg-red-400",
   blue: "text-blue-50 bg-blue-400",
@@ -45,34 +49,9 @@ const closeModal = () => {
 
 const onButtonClick = (btn: Button) => {
   btn.handleClick();
-  closeModal();
 };
 </script>
 
-<!-- USAGE START -->
-
-<!-- 
-<Modal
-    :is-active="modalActived"
-    id-name="asking-for-delete"
-    :message="`Are you sure wanna delete ${idDelete}?`"
-    type="default"
-    :button="[
-        {
-            text: 'Cancel',
-            variant: 'light',
-            handleClick: () => handleModalCancel(),
-        },
-        {
-            text: 'Delete',
-            variant: 'red',
-            handleClick: () => modalHandleDelete(idDelete ?? 0),
-        },
-    ]"
-/>
--->
-
-<!-- USAGE END-->
 <template>
   <div
     v-show="props.isActive"

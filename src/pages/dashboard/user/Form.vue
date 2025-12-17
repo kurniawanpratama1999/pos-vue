@@ -1,10 +1,4 @@
-<script setup lang="ts">
-import { Icon } from "@iconify/vue";
-import { onMounted, reactive } from "vue";
-import { RouterLink, useRoute, useRouter } from "vue-router";
-import FormInput from "../../../components/FormInput.vue";
-import FormSelect from "../../../components/FormSelect.vue";
-
+<script lang="ts">
 interface Role {
   id?: number;
   name?: string;
@@ -36,9 +30,19 @@ interface SendData {
   password: string;
   password_confirmation: string;
 }
+</script>
+
+<script setup lang="ts">
+import { Icon } from "@iconify/vue";
+import { onMounted, reactive } from "vue";
+import { RouterLink, useRoute, useRouter } from "vue-router";
+import FormInput from "../../../components/FormInput.vue";
+import FormSelect from "../../../components/FormSelect.vue";
+import { useModalStore } from "../../../store/modal";
 
 const route = useRoute();
 const router = useRouter();
+const modal = useModalStore();
 const id = route.params.id as string;
 
 const dataUserById = reactive<DataUserById>({
@@ -117,7 +121,6 @@ onMounted(() => {
       dataRoles.success = true;
       dataRoles.data = response.data;
     } catch (error: any) {
-      console.log(error.message);
       dataRoles.success = false;
     } finally {
       dataRoles.loading = false;
@@ -145,9 +148,48 @@ const createUser = async () => {
     });
 
     const response = await hitApiCreateUser.json();
-    console.log(response);
+    if (response.success) {
+      modal.open("create-user", `Create new user is success`, "default", [
+        {
+          text: "Ok",
+          variant: "green",
+          handleClick: () => {
+            router.push({ name: "user.index" });
+            modal.close();
+          },
+        },
+      ]);
+    } else {
+      modal.open(
+        "create-user",
+        `create user ${sendData.name} is failed`,
+        "default",
+        [
+          {
+            text: "Ok",
+            variant: "green",
+            handleClick: () => {
+              modal.close();
+            },
+          },
+        ]
+      );
+    }
   } catch (error) {
-    console.log(error);
+    modal.open(
+      "create-user",
+      `create user ${sendData.name} is failed`,
+      "default",
+      [
+        {
+          text: "Ok",
+          variant: "green",
+          handleClick: () => {
+            modal.close();
+          },
+        },
+      ]
+    );
   }
 };
 
@@ -173,21 +215,85 @@ const updateUser = async () => {
 
     const response = await hitApiUpdateUser.json();
     if (response.success) {
-      router.push({ name: "user.index" });
+      modal.open(
+        "update-user",
+        `Update user ${sendData.name} is success`,
+        "default",
+        [
+          {
+            text: "Ok",
+            variant: "green",
+            handleClick: () => {
+              router.push({ name: "user.index" });
+              modal.close();
+            },
+          },
+        ]
+      );
+    } else {
+      modal.open(
+        "update-user",
+        `Update user ${sendData.name} is failed`,
+        "default",
+        [
+          {
+            text: "Ok",
+            variant: "green",
+            handleClick: () => {
+              modal.close();
+            },
+          },
+        ]
+      );
     }
   } catch (error) {
-    console.log(error);
+    modal.open(
+      "create-user",
+      `create user ${sendData.name} is failed`,
+      "default",
+      [
+        {
+          text: "Ok",
+          variant: "green",
+          handleClick: () => {
+            modal.close();
+          },
+        },
+      ]
+    );
   }
 };
 
 const handleSubmit = () => {
-  console.log({ ...sendData });
-
   if (id) {
     updateUser();
   } else {
     createUser();
   }
+};
+
+const askingForDelete = () => {
+  modal.open(
+    "asking-for-delete",
+    `Are you sure wanna delete user ${sendData.name}?`,
+    "default",
+    [
+      {
+        text: "Cancel",
+        variant: "light",
+        handleClick: () => {
+          modal.close();
+        },
+      },
+      {
+        text: "Delete",
+        variant: "red",
+        handleClick: () => {
+          modal.close();
+        },
+      },
+    ]
+  );
 };
 </script>
 
@@ -239,6 +345,8 @@ const handleSubmit = () => {
 
       <div class="flex items-center gap-2">
         <button
+          v-if="id"
+          @click="askingForDelete"
           type="button"
           class="flex items-center gap-1 bg-red-400 px-3 py-1 rounded"
         >
@@ -251,10 +359,14 @@ const handleSubmit = () => {
         <button
           type="button"
           @click="handleSubmit"
-          class="flex items-center gap-1 bg-emerald-400 rounded px-3 py-1"
+          :class="[
+            'flex items-center gap-1 rounded px-3 py-1',
+            id ? 'bg-blue-400' : 'bg-emerald-400',
+          ]"
         >
           <Icon icon="material-symbols:save" />
-          <span>Save</span>
+          <span v-if="id">Update</span>
+          <span v-else>Save</span>
         </button>
       </div>
     </form>

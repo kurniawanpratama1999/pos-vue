@@ -4,7 +4,9 @@ import { ref, onMounted } from "vue";
 import Card from "../../../components/Card.vue";
 import FormTable from "../../../components/FormTable.vue";
 import { RouterLink } from "vue-router";
-import Modal from "../../../components/Modal.vue";
+import { useModalStore } from "../../../store/modal";
+import type { Button } from "../../../components/Modal.vue";
+// import Modal from "../../../components/Modal.vue";
 
 const API_HOST = "http://localhost:3000/api/v1";
 const API_USER = API_HOST + "/user";
@@ -31,38 +33,29 @@ onMounted(async () => {
   }
 });
 
-const idDelete = ref<number>();
-const modalActived = ref<boolean>(false);
-const handleDelete = (id: number) => {
-  idDelete.value = id;
-  modalActived.value = true;
-};
+const modal = useModalStore();
 
-const modalHandleDelete = (id: number) => {
-  console.log(id);
+const askDelete = (id: number) => {
+  const buttons: Button[] = [
+    {
+      text: "Cancel",
+      variant: "light",
+      handleClick: () => {
+        modal.close();
+      },
+    },
+  ];
+
+  modal.open(
+    "asking-delete-user",
+    `Are you sure wanna delete the id-${id}?`,
+    "default",
+    buttons
+  );
 };
 </script>
 
 <template>
-  <Modal
-    @close="modalActived = false"
-    :is-active="modalActived"
-    id-name="asking-for-delete"
-    :message="`Are you sure wanna delete the id-${idDelete}?`"
-    type="default"
-    :button="[
-      {
-        text: 'Cancel',
-        variant: 'light',
-        handleClick: () => {},
-      },
-      {
-        text: 'Delete',
-        variant: 'red',
-        handleClick: () => modalHandleDelete(idDelete ?? 0),
-      },
-    ]"
-  />
   <section class="py-5">
     <Card
       content-class-name="overflow-x-auto"
@@ -126,7 +119,7 @@ const modalHandleDelete = (id: number) => {
                 <div class="flex items-center gap-3">
                   <button
                     class="px-3 py-2 rounded bg-red-400"
-                    @click="handleDelete(item.id)"
+                    @click="askDelete(item.id)"
                   >
                     <Icon icon="mdi:delete" />
                   </button>
