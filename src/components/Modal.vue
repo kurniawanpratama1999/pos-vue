@@ -36,7 +36,7 @@ const modalBackground = {
 };
 
 const props = withDefaults(defineProps<Props>(), {
-  message: "lorem ipsum dolor sit amet",
+  message: "Something wrong",
   type: "default",
   isActive: false,
 });

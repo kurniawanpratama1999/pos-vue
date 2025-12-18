@@ -12,6 +12,7 @@ export const authRoutes = {
     {
       path: "login",
       component: Login,
+      name: "login",
     },
   ],
 };

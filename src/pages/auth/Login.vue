@@ -1,14 +1,63 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import { reactive } from "vue";
+import FormInput from "../../components/FormInput.vue";
+import { useModalStore } from "../../store/modal";
+import { useRouter } from "vue-router";
+import { useAccessTokenStore } from "../../store/accessToken";
+import { useFetch } from "../../utils/useFetch";
+
+const modal = useModalStore();
+const router = useRouter();
+const auth = reactive({
+  email: "",
+  password: "",
+});
+
+const login = async () => {
+  const apiLogin = "http://localhost:3000/api/v1/auth/login";
+  const fetchApiLogin = await useFetch(apiLogin, false, "POST", "", auth);
+  console.log(fetchApiLogin);
+  if (fetchApiLogin.success) {
+    useAccessTokenStore.value = fetchApiLogin.data;
+    modal.open("user-login", "login berhasil", "default", [
+      {
+        text: "Ok",
+        variant: "green",
+        handleClick: () => {
+          router.push({ name: "user.index" });
+          modal.close();
+        },
+      },
+    ]);
+  } else {
+    let message: string;
+    if (auth.email === "" && auth.password === "") {
+      message = "Email and Password is empty";
+    } else if (auth.email === "") {
+      message = "Email is empty";
+    } else if (auth.password === "") {
+      message = "Password is empty";
+    } else {
+      message = fetchApiLogin.error.message;
+    }
+    modal.open("user-login", message, "default", [
+      {
+        text: "Ok",
+        variant: "green",
+        handleClick: () => {
+          modal.close();
+        },
+      },
+    ]);
+  }
+};
 </script>
 
 <template>
   <div class="min-h-[calc(100dvh-4rem)] flex items-center">
-    <div
-      id="card"
-      class="w-full max-w-sm mx-auto shadow bg-neutral-700 p-5 rounded"
-    >
-      <div id="card-header" class="p-2">
+    <div class="w-full max-w-sm mx-auto shadow bg-neutral-700 p-5 rounded">
+      <div class="p-2">
         <div class="flex text-6xl items-center gap-3 justify-center">
           <Icon icon="streamline-flex:receipt-solid" class="text-emerald-600" />
         </div>
@@ -21,33 +70,26 @@ import { Icon } from "@iconify/vue";
       </div>
       <div id="card-content">
         <form action="" class="form-wraper space-y-5">
-          <div>
-            <label for="email" class="block text-white font-bold mb-1"
-              >Email</label
-            >
-            <input
-              type="email"
-              name="email"
-              id="email"
-              class="form-control outline border-0 px-3 py-2 rounded outline-neutral-400 w-full focus:outline-neutral-100"
-            />
-          </div>
+          <FormInput
+            id-name="email"
+            label="Email"
+            v-model="auth.email"
+            :required="true"
+            type="email"
+          />
 
-          <div>
-            <label for="password" class="block text-white font-bold mb-1"
-              >Password</label
-            >
-            <input
-              type="password"
-              name="password"
-              id="password"
-              class="form-control outline border-0 px-3 py-2 rounded outline-neutral-400 w-full focus:outline-neutral-100"
-            />
-          </div>
+          <FormInput
+            id-name="password"
+            label="Password"
+            v-model="auth.password"
+            :required="true"
+            type="password"
+          />
 
           <div class="mt-8 w-full">
             <button
-              type="submit"
+              @click="login"
+              type="button"
               class="rounded w-full bg-emerald-700 font-bold py-2"
             >
               Login

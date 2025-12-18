@@ -1,29 +1,29 @@
 <script lang="ts">
-interface Role {
+export interface Role {
   id?: number;
   name?: string;
 }
 
-interface UserById {
+export interface UserById {
   role?: Role;
   roleId?: number;
   name?: string;
   email?: string;
 }
 
-interface DataUserById {
+export interface DataUserById {
   success: boolean;
   loading: boolean;
   data: UserById;
 }
 
-interface DataRoles {
+export interface DataRoles {
   success: boolean;
   loading: boolean;
   data: Role[];
 }
 
-interface SendData {
+export interface SendData {
   name: string;
   roleId: number | null;
   email: string;
@@ -36,9 +36,10 @@ interface SendData {
 import { Icon } from "@iconify/vue";
 import { onMounted, reactive } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
+import { useModalStore } from "../../../store/modal";
+import { useAuthFetch } from "../../../utils/useAuthFetch";
 import FormInput from "../../../components/FormInput.vue";
 import FormSelect from "../../../components/FormSelect.vue";
-import { useModalStore } from "../../../store/modal";
 
 const route = useRoute();
 const router = useRouter();
@@ -65,90 +66,37 @@ const sendData = reactive<SendData>({
   password_confirmation: "",
 });
 
-onMounted(() => {
-  const HitApiUserById = async () => {
-    try {
-      const api = `http://localhost:3000/api/v1/user/${id}`;
-      const fetchUser = await fetch(api, {
-        method: "get",
-        headers: {
-          "x-current-url": window.location.pathname,
-        },
-      });
-
-      if (!fetchUser.ok) {
-        throw new Error("Fetch user is not ok");
-      }
-
-      const response = await fetchUser.json();
-
-      if (!response.success) {
-        throw new Error("response for fetching user is failed");
-      }
-
-      dataUserById.success = true;
-      dataUserById.data = response.data;
-      const { name, email, roleId } = dataUserById.data;
-
-      Object.assign(sendData, {
-        name,
-        email,
-        roleId,
-      });
-    } catch (error) {
-      dataUserById.success = false;
-    } finally {
-      dataUserById.loading = false;
-    }
-  };
-
-  const HitApiRole = async () => {
-    try {
-      const api = `http://localhost:3000/api/v1/role`;
-      const fetchRoles = await fetch(api, {
-        method: "get",
-        headers: {
-          "x-current-url": window.location.pathname,
-        },
-      });
-
-      const response = await fetchRoles.json();
-
-      if (!response.success) {
-        throw new Error("response for fetching roles is failed");
-      }
-
-      dataRoles.success = true;
-      dataRoles.data = response.data;
-    } catch (error: any) {
-      dataRoles.success = false;
-    } finally {
-      dataRoles.loading = false;
-    }
-  };
-
+onMounted(async () => {
   if (id) {
-    HitApiUserById();
+    const apiUserById = `http://localhost:3000/api/v1/user/${id}`;
+    const fetchApiUserById = await useAuthFetch(apiUserById, true, "GET");
+
+    if (fetchApiUserById.success) {
+      Object.assign(sendData, {
+        name: fetchApiUserById.data.name,
+        email: fetchApiUserById.data.email,
+        roleId: fetchApiUserById.data.roleId,
+      });
+    }
   }
 
-  HitApiRole();
+  const apiRoles = "http://localhost:3000/api/v1/role";
+  const fetchApiRoles = await useAuthFetch(apiRoles, true, "GET");
+  if (fetchApiRoles.success) {
+    dataRoles.data = fetchApiRoles.data;
+  }
 });
 
 const createUser = async () => {
   try {
     const apiCreateUser = "http://localhost:3000/api/v1/user";
-    const hitApiCreateUser = await fetch(apiCreateUser, {
-      credentials: "include",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-current-url": window.location.pathname,
-      },
-      body: JSON.stringify(sendData),
-    });
-
-    const response = await hitApiCreateUser.json();
-    if (response.success) {
+    const fetchCreateUser = await useAuthFetch(
+      apiCreateUser,
+      true,
+      "POST",
+      sendData
+    );
+    if (fetchCreateUser.success) {
       modal.open("create-user", `Create new user is success`, "default", [
         {
           text: "Ok",
@@ -203,18 +151,15 @@ const updateUser = async () => {
     } else {
       results = sendData;
     }
-    const hitApiUpdateUser = await fetch(apiUpdateUser, {
-      credentials: "include",
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "x-current-url": window.location.pathname,
-      },
-      body: JSON.stringify(results),
-    });
 
-    const response = await hitApiUpdateUser.json();
-    if (response.success) {
+    const fetchApiUpdateUser = await useAuthFetch(
+      apiUpdateUser,
+      true,
+      "PUT",
+      results
+    );
+
+    if (fetchApiUpdateUser.success) {
       modal.open(
         "update-user",
         `Update user ${sendData.name} is success`,
@@ -288,8 +233,16 @@ const askingForDelete = () => {
       {
         text: "Delete",
         variant: "red",
-        handleClick: () => {
-          modal.close();
+        handleClick: async () => {
+          const apiDeleteUser = `http://localhost:3000/api/v1/user/${id}/delete`;
+          const fetchApiUsers = await useAuthFetch(
+            apiDeleteUser,
+            true,
+            "PATCH"
+          );
+          if (fetchApiUsers.success) {
+            modal.close();
+          }
         },
       },
     ]

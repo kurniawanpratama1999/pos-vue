@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Dropdown from "../components/Dropdown.vue";
-
+import { useFetch } from "../utils/useFetch";
+import { useRouter } from "vue-router";
+import { useAuthFetch } from "../utils/useAuthFetch";
+const router = useRouter();
 const isAsideActive = ref<boolean>(false);
 const handleAside = (): void => {
   isAsideActive.value = !isAsideActive.value;
@@ -13,6 +16,27 @@ const asideClassName = computed<string>(() => {
 const backdropClassName = computed(() => {
   return isAsideActive.value ? "fixed lg:hidden" : "hidden";
 });
+
+onMounted(async () => {
+  const fetchRefreshToken = await useFetch(
+    "http://localhost:3000/api/v1/auth/refresh",
+    true,
+    "GET"
+  );
+
+  if (!fetchRefreshToken.success) {
+    router.push({ name: "login" });
+  }
+});
+
+const logout = async () => {
+  await useAuthFetch(
+    "http://localhost:3000/api/v1/auth/logout",
+    false,
+    "DELETE"
+  );
+  router.push({ name: "login" });
+};
 </script>
 
 <template>
@@ -112,7 +136,7 @@ const backdropClassName = computed(() => {
         <template #items>
           <a href="#">Kurniawan Pratama</a>
           <a href="#">Schedule</a>
-          <a href="#">Logout</a>
+          <button @click="logout" class="inline w-fit">Logout</button>
         </template>
       </Dropdown>
     </aside>

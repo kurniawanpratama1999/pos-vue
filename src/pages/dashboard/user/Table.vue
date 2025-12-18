@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import Card from "../../../components/Card.vue";
 import FormTable from "../../../components/FormTable.vue";
 import { RouterLink } from "vue-router";
 import { useModalStore } from "../../../store/modal";
 import type { Button } from "../../../components/Modal.vue";
-// import Modal from "../../../components/Modal.vue";
+import { useAuthFetch } from "../../../utils/useAuthFetch";
 
-const API_HOST = "http://localhost:3000/api/v1";
-const API_USER = API_HOST + "/user";
 interface User {
   id: number;
   role: { name: string };
@@ -17,19 +15,36 @@ interface User {
   email: string;
   created_at: string;
 }
+
 const users = ref<User[]>([]);
+const search = ref<string>("");
+let idTime: number | null = null;
+
+watch(search, () => {
+  if (idTime) {
+    clearTimeout(idTime);
+  }
+
+  const filterUser = async () => {
+    const searchValue = search.value.trim() !== "" ? `?q=${search.value}` : "";
+    const apiSearchUser = `http://localhost:3000/api/v1/user${searchValue}`;
+    const fetchSearchUser = await useAuthFetch(apiSearchUser, true, "GET");
+    if (fetchSearchUser.success) {
+      users.value = fetchSearchUser.data;
+    }
+  };
+
+  idTime = setTimeout(() => {
+    filterUser();
+  }, 300);
+});
 
 onMounted(async () => {
-  const HIT_USER = await fetch(API_USER, {
-    headers: {
-      "x-current-url": window.location.pathname,
-    },
-  });
+  const apiUsers = "http://localhost:3000/api/v1/user";
+  const fetchApiUsers = await useAuthFetch(apiUsers, true, "GET");
 
-  const response = await HIT_USER.json();
-
-  if (response.success) {
-    users.value = response.data;
+  if (fetchApiUsers.success) {
+    users.value = fetchApiUsers.data;
   }
 });
 
@@ -42,6 +57,17 @@ const askDelete = (id: number) => {
       variant: "light",
       handleClick: () => {
         modal.close();
+      },
+    },
+    {
+      text: "Delete",
+      variant: "red",
+      handleClick: async () => {
+        const apiDeleteUser = `http://localhost:3000/api/v1/user/${id}/delete`;
+        const fetchApiUsers = await useAuthFetch(apiDeleteUser, true, "PATCH");
+        if (fetchApiUsers.success) {
+          modal.close();
+        }
       },
     },
   ];
@@ -74,6 +100,7 @@ const askDelete = (id: number) => {
               id="search"
               class="py-1 w-full border-0 outline-0"
               placeholder="Search user..."
+              v-model="search"
             />
             <Icon icon="mingcute:search-line" />
           </label>
