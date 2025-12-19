@@ -15,33 +15,44 @@ const auth = reactive({
 });
 
 const login = async () => {
-  const apiLogin = "http://localhost:3000/api/v1/auth/login";
-  const fetchApiLogin = await useFetch(apiLogin, false, "POST", "", auth);
-  console.log(fetchApiLogin);
-  if (fetchApiLogin.success) {
-    useAccessTokenStore.value = fetchApiLogin.data;
-    modal.open("user-login", "login berhasil", "default", [
-      {
-        text: "Ok",
-        variant: "green",
-        handleClick: () => {
-          router.push({ name: "user.index" });
-          modal.close();
+  try {
+    const apiLogin = "http://localhost:3000/api/v1/auth/login";
+    const fetchApiLogin = await useFetch(apiLogin, false, "POST", "", auth);
+    if (fetchApiLogin.success) {
+      useAccessTokenStore.value = fetchApiLogin.data;
+      modal.open("user-login", "login berhasil", "default", [
+        {
+          text: "Ok",
+          variant: "green",
+          handleClick: () => {
+            router.push({ name: "user.index" });
+            modal.close();
+          },
         },
-      },
-    ]);
-  } else {
-    let message: string;
-    if (auth.email === "" && auth.password === "") {
-      message = "Email and Password is empty";
-    } else if (auth.email === "") {
-      message = "Email is empty";
-    } else if (auth.password === "") {
-      message = "Password is empty";
+      ]);
     } else {
-      message = fetchApiLogin.error.message;
+      let message: string;
+      if (auth.email === "" && auth.password === "") {
+        message = "Email and Password is empty";
+      } else if (auth.email === "") {
+        message = "Email is empty";
+      } else if (auth.password === "") {
+        message = "Password is empty";
+      } else {
+        message = fetchApiLogin.error.message;
+      }
+      modal.open("user-login", message, "default", [
+        {
+          text: "Ok",
+          variant: "green",
+          handleClick: () => {
+            modal.close();
+          },
+        },
+      ]);
     }
-    modal.open("user-login", message, "default", [
+  } catch (error: any) {
+    modal.open("user-login", error.message, "default", [
       {
         text: "Ok",
         variant: "green",

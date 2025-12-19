@@ -18,13 +18,17 @@ const backdropClassName = computed(() => {
 });
 
 onMounted(async () => {
-  const fetchRefreshToken = await useFetch(
-    "http://localhost:3000/api/v1/auth/refresh",
-    true,
-    "GET"
-  );
+  try {
+    const fetchRefreshToken = await useFetch(
+      "http://localhost:3000/api/v1/auth/refresh",
+      true,
+      "GET"
+    );
 
-  if (!fetchRefreshToken.success) {
+    if (!fetchRefreshToken.success) {
+      router.push({ name: "login" });
+    }
+  } catch (error) {
     router.push({ name: "login" });
   }
 });
