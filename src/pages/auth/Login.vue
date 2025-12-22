@@ -1,114 +1,101 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { reactive } from "vue";
-import FormInput from "../../components/FormInput.vue";
-import { useModalStore } from "../../store/modal";
+import UiFormInput from "../../components/Ui/UiFormInput.vue";
+import UiForm from "../../components/Ui/UiForm.vue";
+import { reactive, ref, watch } from "vue";
+import { axiosOrigin } from "../../store/axiosOrigin";
+import { useDataStore } from "../../store/data";
 import { useRouter } from "vue-router";
-import { useAccessTokenStore } from "../../store/accessToken";
-import { useFetch } from "../../utils/useFetch";
+import z from "zod";
 
-const modal = useModalStore();
+const dataStore = useDataStore();
 const router = useRouter();
-const auth = reactive({
+
+const credentials = reactive({
   email: "",
   password: "",
 });
 
-const login = async () => {
+const loginActive = ref<boolean>(false);
+
+watch([credentials], () => {
+  const credentialCheck = z.object({
+    email: z.email(),
+    password: z.string().min(8),
+  });
+
   try {
-    const apiLogin = "http://localhost:3000/api/v1/auth/login";
-    const fetchApiLogin = await useFetch(apiLogin, false, "POST", "", auth);
-    if (fetchApiLogin.success) {
-      useAccessTokenStore.value = fetchApiLogin.data;
-      modal.open("user-login", "login berhasil", "default", [
-        {
-          text: "Ok",
-          variant: "green",
-          handleClick: () => {
-            router.push({ name: "user.index" });
-            modal.close();
-          },
-        },
-      ]);
-    } else {
-      let message: string;
-      if (auth.email === "" && auth.password === "") {
-        message = "Email and Password is empty";
-      } else if (auth.email === "") {
-        message = "Email is empty";
-      } else if (auth.password === "") {
-        message = "Password is empty";
-      } else {
-        message = fetchApiLogin.error.message;
-      }
-      modal.open("user-login", message, "default", [
-        {
-          text: "Ok",
-          variant: "green",
-          handleClick: () => {
-            modal.close();
-          },
-        },
-      ]);
-    }
-  } catch (error: any) {
-    modal.open("user-login", error.message, "default", [
-      {
-        text: "Ok",
-        variant: "green",
-        handleClick: () => {
-          modal.close();
-        },
-      },
-    ]);
+    credentialCheck.parse({
+      email: credentials.email,
+      password: credentials.password,
+    });
+    loginActive.value = true;
+  } catch (error) {
+    loginActive.value = false;
   }
-};
+});
+
+async function login() {
+  try {
+    const response = await axiosOrigin.post("/auth/login", {
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    const { data } = response.data;
+    dataStore.setToken(data);
+    router.push({ name: "dashboard" });
+  } catch (error) {
+    console.log(error);
+  }
+}
 </script>
 
 <template>
-  <div class="min-h-[calc(100dvh-4rem)] flex items-center">
-    <div class="w-full max-w-sm mx-auto shadow bg-neutral-700 p-5 rounded">
-      <div class="p-2">
-        <div class="flex text-6xl items-center gap-3 justify-center">
-          <Icon icon="streamline-flex:receipt-solid" class="text-emerald-600" />
-        </div>
-        <h2
-          class="text-center text-2xl text-emerald-600"
-          style="text-shadow: 1px 1px 1px var(--color-emerald-300)"
-        >
-          LOGIN ACCOUNT
+  <section class="flex-center flex-col h-dvh">
+    <div class="w-full max-w-xs mx-auto">
+      <header class="flex-center flex-col w-full text-center p-2">
+        <Icon icon="mdi:money" class="text-7xl text-emerald-500" />
+        <h2 class="text-3xl font-black text-emerald-500">
+          Point of Sales <small>1.0</small>
         </h2>
-      </div>
-      <div id="card-content">
-        <form action="" class="form-wraper space-y-5">
-          <FormInput
-            id-name="email"
+      </header>
+
+      <hr class="border-neutral-400" />
+      <UiForm>
+        <template #form-control>
+          <UiFormInput
+            v-model="credentials.email"
+            id="email"
             label="Email"
-            v-model="auth.email"
-            :required="true"
             type="email"
+            required="true"
+            :z="z.email()"
           />
-
-          <FormInput
-            id-name="password"
+          <UiFormInput
+            v-model="credentials.password"
+            id="password"
             label="Password"
-            v-model="auth.password"
-            :required="true"
             type="password"
+            required="true"
+            :z="z.string().min(8)"
           />
+        </template>
 
-          <div class="mt-8 w-full">
-            <button
-              @click="login"
-              type="button"
-              class="rounded w-full bg-emerald-700 font-bold py-2"
-            >
-              Login
-            </button>
-          </div>
-        </form>
-      </div>
-      <div class="card-footer"></div>
+        <template #form-button>
+          <button
+            type="button"
+            @click="login"
+            :class="[
+              'px-3 py-1 rounded bg-emerald-400 w-full text-white font-bold',
+              'disabled:bg-neutral-600',
+            ]"
+            :disabled="!loginActive"
+          >
+            Login
+          </button>
+        </template>
+      </UiForm>
     </div>
-  </div>
+  </section>
 </template>

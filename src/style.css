@@ -1,8 +1,13 @@
 @import "tailwindcss";
+
 html {
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-neutral-200);
 }
 
 button {
   cursor: pointer;
+}
+
+@utility flex-center {
+  @apply flex items-center justify-center;
 }
