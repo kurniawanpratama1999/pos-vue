@@ -22,8 +22,10 @@ router.beforeEach(async (to, _, next) => {
   const isAuth = await authenticate();
   if (to.name !== "login" && !isAuth) {
     next({ name: "login" });
+    return;
   } else {
     next();
+    return;
   }
 });
 

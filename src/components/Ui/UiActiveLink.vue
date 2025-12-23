@@ -7,7 +7,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <RouterLink activeClass="font-bold" :to="props.href">
+  <router-link activeClass="font-bold" :to="props.href">
     <slot></slot>
-  </RouterLink>
+  </router-link>
 </template>

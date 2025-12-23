@@ -24,7 +24,8 @@ const props = withDefaults(
     className: () => ({
       wraper: "grid w-full",
       label: "w-full",
-      input: "w-full border px-3 py-1 border-neutral-400 rounded",
+      input:
+        "w-full border px-3 py-1 border-neutral-400 rounded outline-0 focus:outline outline-emerald-400",
       message: "text-xs text-red-500 italic",
     }),
     type: "text",
@@ -60,7 +61,7 @@ watch(model, () => {
       autocapitalize="off"
       :required="props.required"
     />
-    <span v-show="errMessage" :class="props.className.message">
+    <span v-show="errMessage && model" :class="props.className.message">
       {{ errMessage }}
     </span>
   </div>

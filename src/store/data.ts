@@ -1,7 +1,12 @@
 import { defineStore } from "pinia";
-
+interface Me {
+  id: number;
+  roleId: number;
+  name: string;
+  email: string;
+}
 const useDataStore = defineStore("data", {
-  state: (): { me: any | null; token: string | null } => ({
+  state: (): { me: Me | null; token: string | null } => ({
     me: null,
     token: null,
   }),
@@ -9,7 +14,7 @@ const useDataStore = defineStore("data", {
     original: (state) => state,
   },
   actions: {
-    setMe(me: any) {
+    setMe(me: Me) {
       this.me = me;
     },
     setToken(token: string | null) {

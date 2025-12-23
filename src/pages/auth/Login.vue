@@ -4,11 +4,10 @@ import UiFormInput from "../../components/Ui/UiFormInput.vue";
 import UiForm from "../../components/Ui/UiForm.vue";
 import { reactive, ref, watch } from "vue";
 import { axiosOrigin } from "../../store/axiosOrigin";
-import { useDataStore } from "../../store/data";
 import { useRouter } from "vue-router";
 import z from "zod";
+import { useAccessTokenStore } from "../../store/token";
 
-const dataStore = useDataStore();
 const router = useRouter();
 
 const credentials = reactive({
@@ -37,14 +36,16 @@ watch([credentials], () => {
 
 async function login() {
   try {
-    const response = await axiosOrigin.post("/auth/login", {
-      email: credentials.email,
-      password: credentials.password,
-    });
+    if (loginActive.value) {
+      const response = await axiosOrigin.post("/auth/login", {
+        email: credentials.email,
+        password: credentials.password,
+      });
 
-    const { data } = response.data;
-    dataStore.setToken(data);
-    router.push({ name: "dashboard" });
+      const { data } = response.data;
+      useAccessTokenStore.value = data;
+      router.push({ name: "dashboard" });
+    }
   } catch (error) {
     console.log(error);
   }

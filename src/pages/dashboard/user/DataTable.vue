@@ -1,60 +1,80 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useDataStore } from "../../../store/data";
+import { axiosOrigin } from "../../../store/axiosOrigin";
+import { AxiosError } from "axios";
+import { useAccessTokenStore } from "../../../store/token";
+import { useDateIndo } from "../../../utils/useDateIndo";
+import UiTable from "../../../components/Ui/UiTable.vue";
+import UiTableActions from "../../../components/Ui/UiTableActions.vue";
+import UiFormSearch from "../../../components/Ui/UiFormSearch.vue";
+import UiTableAdd from "../../../components/Ui/UiTableAdd.vue";
+
+interface Role {
+  id: number;
+  name: string;
+}
 
 interface Users {
   id: number;
   name: string;
-  rolename: string;
+  role: Role;
   email: string;
-  date: string;
+  created_at: string;
 }
 
-const dataStore = useDataStore();
-const tbody = ref<Users[]>([]);
-onMounted(() => {
-  console.log(dataStore.original.me);
-  console.log(dataStore.original.token);
+const users = ref<Users[]>([]);
+onMounted(async () => {
+  try {
+    const fetchUsers = await axiosOrigin.get("/user", {
+      headers: { Authorization: `Bearer ${useAccessTokenStore.value}` },
+    });
+
+    users.value = fetchUsers.data.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log(error.status);
+    }
+  }
 });
 </script>
 
 <template>
-  <section class="w-full overflow-x-auto">
-    <table
-      :class="[
-        '[&_th]:px-2 [&_th]:text-nowrap',
-        '[&_td]:px-2 [&_td]:text-nowrap',
-      ]"
-    >
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Email</th>
-          <th>Date</th>
-          <th></th>
+  <section class="w-full">
+    <UiTable :source="users">
+      <template #cheader>
+        <UiFormSearch
+          id="search-user"
+          name="search-user"
+          placeholder="Search user"
+        />
+        <UiTableAdd />
+      </template>
+      <template #thead>
+        <th>
+          <input type="checkbox" name="cb-all" id="cb-all" />
+        </th>
+        <th>Name</th>
+        <th>RoleName</th>
+        <th>Email</th>
+        <th>Created at</th>
+        <th>Actions</th>
+      </template>
+      <template #tbody="{ items }">
+        <tr :key="'user-table-' + items.id">
+          <td>
+            <input
+              type="checkbox"
+              :name="`cb` + items.id"
+              :id="`cb` + items.id"
+            />
+          </td>
+          <td>{{ items.name }}</td>
+          <td>{{ items.role.name }}</td>
+          <td>{{ items.email }}</td>
+          <td>{{ useDateIndo(new Date(items.created_at)) }}</td>
+          <td><UiTableActions /></td>
         </tr>
-      </thead>
-      <tbody>
-        <template v-for="value in tbody">
-          <tr v-if="value" :key="'tbody' + value.id">
-            <td>
-              <input type="checkbox" name="" id="" />
-            </td>
-            <td>{{ value.name }}</td>
-            <td>{{ value.rolename }}</td>
-            <td>{{ value.email }}</td>
-            <td>{{ value.date }}</td>
-            <td>
-              <div class="flex gap-2">
-                <button>Delete</button>
-                <button>Edit</button>
-              </div>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
+      </template>
+    </UiTable>
   </section>
 </template>
