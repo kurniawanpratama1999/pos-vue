@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, type HTMLAttributes, type InputHTMLAttributes } from "vue";
-import { ZodError, type ZodType } from "zod";
+import { type HTMLAttributes, type InputHTMLAttributes } from "vue";
 
 interface ClassName {
   wraper?: HTMLAttributes["class"];
@@ -18,44 +17,33 @@ const props = withDefaults(
     className?: ClassName;
     type?: InputHTMLAttributes["type"];
     required?: InputHTMLAttributes["required"];
-    z: ZodType;
+    errMessage?: string;
   }>(),
   {
     className: () => ({
       wraper: "grid w-full",
       label: "w-full",
-      input:
-        "w-full border px-3 py-1 border-neutral-400 rounded outline-0 focus:outline outline-emerald-400",
+      input: "",
       message: "text-xs text-red-500 italic",
     }),
     type: "text",
     required: true,
   }
 );
-
-const errMessage = ref<string>("");
-
-watch(model, () => {
-  try {
-    props.z.parse(model.value);
-    errMessage.value = "";
-  } catch (error) {
-    if (error instanceof ZodError) {
-      errMessage.value = error.flatten((e) => e.message).formErrors[0] ?? "";
-    }
-  }
-});
 </script>
 
 <template>
   <div :class="props.className.wraper">
-    <label :for="props.id" :class="props.className.label">{{
-      props.label
-    }}</label>
+    <label :for="props.id" :class="props.className.label">
+      {{ props.label }} <small v-if="required" class="text-red-500">*</small>
+    </label>
     <input
       v-model="model"
       :type="props.type"
-      :class="props.className.input"
+      :class="[
+        'w-full border px-3 py-1 border-neutral-400 rounded outline-0 focus:outline outline-emerald-400',
+        props.className.input,
+      ]"
       autocomplete="off"
       autocorrect="off"
       autocapitalize="off"

@@ -1,16 +1,14 @@
-import { axiosOrigin } from "../store/axiosOrigin";
-import { useDataStore } from "../store/data";
+import { useMeStore } from "../store/useMeStore";
+import { axiosOrigin } from "../utils/useAxiosOrigin";
 
 export const authenticate = async (): Promise<boolean> => {
-  const dataStore = useDataStore();
   try {
     const getAuth = await axiosOrigin.get("/auth/me");
     if (getAuth.status !== 200) {
       return false;
     }
 
-    const { data } = getAuth.data;
-    dataStore.setMe(data);
+    useMeStore.value = getAuth.data.data;
     return true;
   } catch (error) {
     return false;

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { type RouteLocationAsRelativeGeneric } from "vue-router";
-
 const props = defineProps<{
   href: RouteLocationAsRelativeGeneric;
 }>();

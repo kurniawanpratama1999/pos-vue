@@ -15,35 +15,47 @@ const dashRouter: RouteRecordRaw = {
       redirect: { name: "user" },
       name: "dashboard",
     },
+
     {
       path: "user",
-      component: UserDataTable,
-      name: "user",
+      children: [
+        {
+          path: "",
+          component: UserDataTable,
+          name: "user",
+        },
+        {
+          path: "create",
+          component: UserFormCreateUpdate,
+          name: "user.create",
+        },
+        {
+          path: ":id/show",
+          component: UserFormCreateUpdate,
+          name: "user.show",
+        },
+      ],
     },
-    {
-      path: "user/create",
-      component: UserFormCreateUpdate,
-      name: "user.create",
-    },
-    {
-      path: "user/:id/show",
-      component: UserFormCreateUpdate,
-      name: "user.show",
-    },
+
     {
       path: "role",
-      component: RoleDataTable,
-      name: "role",
-    },
-    {
-      path: "role/create",
-      component: RoleFormCreateUpdate,
-      name: "role.create",
-    },
-    {
-      path: "role/:id/show",
-      component: RoleFormCreateUpdate,
-      name: "role.show",
+      children: [
+        {
+          path: "",
+          component: RoleDataTable,
+          name: "role",
+        },
+        {
+          path: "create",
+          component: RoleFormCreateUpdate,
+          name: "role.create",
+        },
+        {
+          path: ":id/show",
+          component: RoleFormCreateUpdate,
+          name: "role.show",
+        },
+      ],
     },
   ],
 };

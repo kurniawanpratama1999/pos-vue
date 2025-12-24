@@ -1,53 +1,51 @@
 <script setup lang="ts">
+import { reactive } from "vue";
 import { Icon } from "@iconify/vue";
-import UiFormInput from "../../components/Ui/UiFormInput.vue";
-import UiForm from "../../components/Ui/UiForm.vue";
-import { reactive, ref, watch } from "vue";
-import { axiosOrigin } from "../../store/axiosOrigin";
-import { useRouter } from "vue-router";
-import z from "zod";
-import { useAccessTokenStore } from "../../store/token";
 
-const router = useRouter();
+import { axiosOrigin } from "../../utils/useAxiosOrigin";
+
+import { useAccessTokenStore } from "../../store/useAccessTokenStore";
+import { useAlertStore } from "../../store/useAlertStore";
+
+import UiForm from "../../components/Ui/UiForm.vue";
+import UiFormInput from "../../components/Ui/UiFormInput.vue";
+
+const alert = useAlertStore();
 
 const credentials = reactive({
   email: "",
   password: "",
 });
 
-const loginActive = ref<boolean>(false);
-
-watch([credentials], () => {
-  const credentialCheck = z.object({
-    email: z.email(),
-    password: z.string().min(8),
+function loginSuccess() {
+  alert.open({
+    message: "Login berhasil ye",
+    variant: "success",
+    redirectTo: { name: "user" },
   });
+}
 
+function loginFailed() {
+  alert.open({
+    message: "Gagal Login",
+    variant: "invalid",
+  });
+}
+
+async function submit() {
   try {
-    credentialCheck.parse({
+    const response = await axiosOrigin.post("/auth/login", {
       email: credentials.email,
       password: credentials.password,
     });
-    loginActive.value = true;
-  } catch (error) {
-    loginActive.value = false;
-  }
-});
 
-async function login() {
-  try {
-    if (loginActive.value) {
-      const response = await axiosOrigin.post("/auth/login", {
-        email: credentials.email,
-        password: credentials.password,
-      });
+    useAccessTokenStore.value = response.data.data;
 
-      const { data } = response.data;
-      useAccessTokenStore.value = data;
-      router.push({ name: "dashboard" });
-    }
+    loginSuccess();
   } catch (error) {
-    console.log(error);
+    loginFailed();
+  } finally {
+    credentials.password = "";
   }
 }
 </script>
@@ -63,7 +61,7 @@ async function login() {
       </header>
 
       <hr class="border-neutral-400" />
-      <UiForm>
+      <UiForm @submit.prevent="submit">
         <template #form-control>
           <UiFormInput
             v-model="credentials.email"
@@ -71,7 +69,6 @@ async function login() {
             label="Email"
             type="email"
             required="true"
-            :z="z.email()"
           />
           <UiFormInput
             v-model="credentials.password"
@@ -79,19 +76,16 @@ async function login() {
             label="Password"
             type="password"
             required="true"
-            :z="z.string().min(8)"
           />
         </template>
 
         <template #form-button>
           <button
-            type="button"
-            @click="login"
+            type="submit"
             :class="[
               'px-3 py-1 rounded bg-emerald-400 w-full text-white font-bold',
               'disabled:bg-neutral-600',
             ]"
-            :disabled="!loginActive"
           >
             Login
           </button>

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { axiosOrigin } from "../../../store/axiosOrigin";
+import { axiosOrigin } from "../../../utils/useAxiosOrigin";
 import { AxiosError } from "axios";
-import { useAccessTokenStore } from "../../../store/token";
+import { useAccessTokenStore } from "../../../store/useAccessTokenStore";
 import { useDateIndo } from "../../../utils/useDateIndo";
 import UiTable from "../../../components/Ui/UiTable.vue";
 import UiTableActions from "../../../components/Ui/UiTableActions.vue";
 import UiFormSearch from "../../../components/Ui/UiFormSearch.vue";
 import UiTableAdd from "../../../components/Ui/UiTableAdd.vue";
+import { useAlertStore } from "../../../store/useAlertStore";
 
 interface Role {
   id: number;
@@ -21,7 +22,8 @@ interface Users {
   email: string;
   created_at: string;
 }
-
+// LOGIC
+const alert = useAlertStore();
 const users = ref<Users[]>([]);
 onMounted(async () => {
   try {
@@ -32,10 +34,34 @@ onMounted(async () => {
     users.value = fetchUsers.data.data;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.log(error.status);
+      console.error("Something went wrong");
     }
   }
 });
+
+function handleDelete() {
+  alert.open({
+    message: "Are u sure want to delete?",
+    variant: "delete",
+    action: [
+      {
+        text: "Cancel",
+        className: "ml-auto text-neutral-700!",
+        variant: "transparent",
+        handleClick: () => {
+          alert.close();
+        },
+      },
+      {
+        text: "Yes, delete it",
+        variant: "red",
+        handleClick: () => {
+          console.log("delete");
+        },
+      },
+    ],
+  });
+}
 </script>
 
 <template>
@@ -53,10 +79,10 @@ onMounted(async () => {
         <th>
           <input type="checkbox" name="cb-all" id="cb-all" />
         </th>
-        <th>Name</th>
-        <th>RoleName</th>
-        <th>Email</th>
-        <th>Created at</th>
+        <th class="w-1/4">Name</th>
+        <th class="w-1/4">RoleName</th>
+        <th class="w-1/4">Email</th>
+        <th class="w-1/4">Created at</th>
         <th>Actions</th>
       </template>
       <template #tbody="{ items }">
@@ -72,7 +98,16 @@ onMounted(async () => {
           <td>{{ items.role.name }}</td>
           <td>{{ items.email }}</td>
           <td>{{ useDateIndo(new Date(items.created_at)) }}</td>
-          <td><UiTableActions /></td>
+          <td>
+            <UiTableActions
+              :handle-delete="
+                () => {
+                  handleDelete();
+                }
+              "
+              :router-edit="{ name: 'user.show', params: { id: items.id } }"
+            />
+          </td>
         </tr>
       </template>
     </UiTable>

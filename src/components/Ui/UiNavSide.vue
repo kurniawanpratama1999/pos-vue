@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useDataStore } from "../../store/data";
+import { useMeStore } from "../../store/useMeStore";
 import UiActiveLink from "./UiActiveLink.vue";
-const dataStore = useDataStore();
-const me = dataStore.original.me;
 </script>
 
 <template>
@@ -48,7 +46,7 @@ const me = dataStore.original.me;
       </nav> -->
 
       <nav class="mt-auto border-t border-t-neutral-400 pt-2">
-        <h2 class="text-lg font-bold mb-1"># {{ me?.name }}</h2>
+        <h2 class="text-lg font-bold mb-1"># {{ useMeStore?.name }}</h2>
         <div class="flex flex-col pl-[1.1rem] gap-1">
           <p>Logout</p>
         </div>
