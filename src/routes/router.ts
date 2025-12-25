@@ -6,6 +6,7 @@ import {
 import { authRouter } from "@/routes/authRouter";
 import { dashRouter } from "@/routes/dashRouter";
 import { authenticate } from "@/libs/Authenticate";
+import { useAlertStore } from "@/store/useAlertStore";
 
 const routes: RouteRecordRaw[] = [
   { path: "/", redirect: { name: "login" } },
@@ -22,6 +23,9 @@ router.beforeEach(async (to, _, next) => {
   const isAuth = await authenticate();
   if (to.name !== "login" && !isAuth) {
     next({ name: "login" });
+    return;
+  } else if (to.name == "login" && isAuth) {
+    next({ name: "dashboard" });
     return;
   } else {
     next();

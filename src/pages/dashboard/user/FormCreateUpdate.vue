@@ -1,43 +1,31 @@
 <script setup lang="ts">
-/* IMPORT */
-//! modules
 import { onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
-import { AxiosError } from "axios";
+
 import { useAlertStore } from "@/store/useAlertStore";
-import { axiosOrigin } from "@/utils/useAxiosOrigin";
+
+import {
+  type User,
+  type SaveUser,
+  show,
+  update,
+  create,
+} from "@/controllers/userController";
 import UiFormInput from "@/components/Ui/UiFormInput.vue";
 import UiIcon from "@/components/Ui/UiIcon.vue";
 import UiForm from "@/components/Ui/UiForm.vue";
 import UiFormSelect from "@/components/Ui/UiFormSelect.vue";
-
-interface Role {
-  id: string;
-  name: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  roleId: string;
-  roleName: string;
-}
-
-interface UserInput {
-  name: string;
-  roleId: string;
-  email: string;
-  password?: string;
-  password_confirmation?: string;
-}
+import { RoleController, type Role } from "@/controllers/roleController";
 
 const route = useRoute();
+
 const alert = useAlertStore();
-const userId = ref<string | undefined>(undefined);
+
+const userId = route.params.id as string;
 
 const roles = ref<Role[] | undefined>(undefined);
-const user = reactive<UserInput>({
+
+const user = reactive<SaveUser>({
   name: "",
   roleId: "",
   email: "",
@@ -46,22 +34,21 @@ const user = reactive<UserInput>({
 });
 
 onMounted(async () => {
-  const paramsId = route.params.id as string;
-  userId.value = paramsId;
   try {
-    if (userId.value) {
-      const existingUser = await axiosOrigin.get(`/user/${userId.value}`);
-      const data: User = existingUser.data.data;
+    if (userId) {
+      const data: User | undefined = await show(userId);
+
       Object.assign(user, {
-        name: data.name,
-        email: data.email,
-        roleId: String(data.roleId),
+        name: data?.name,
+        email: data?.email,
+        roleId: data?.roleId,
       });
     }
 
-    const existingRole = await axiosOrigin.get("/role");
-    roles.value = existingRole.data.data;
-  } catch (error) {}
+    roles.value = await RoleController.index();
+  } catch (error) {
+    console.error("cannot get user and/or role");
+  }
 });
 
 function resetForm() {
@@ -69,63 +56,30 @@ function resetForm() {
   user.password_confirmation = "";
 }
 
-async function updateUser() {
-  const send: UserInput = {
-    name: user.name,
-    email: user.email,
-    roleId: user.roleId,
-  };
-
-  if (user.password !== "") {
-    send.password = user.password;
-  }
-
-  try {
-    await axiosOrigin.put(`/user/${userId.value}`, send);
-    alert.open({
-      message: "User is updated",
-      variant: "success",
-      redirectTo: { name: "user" },
-    });
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      alert.open({
-        message: "Update user is failed",
-        variant: "invalid",
-      });
-    }
-  } finally {
-    resetForm();
-  }
-}
-
-async function createUser() {
-  try {
-    await axiosOrigin.post("/user", { ...user, roleId: Number(user.roleId) });
-    alert.open({
-      message: "New user is added",
-      variant: "success",
-      redirectTo: { name: "user" },
-    });
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      alert.open({
-        message: "Failed for add user",
-        variant: "invalid",
-      });
-    }
-  } finally {
-    resetForm();
-  }
-}
-
 async function submit() {
-  if (userId.value) {
-    await updateUser();
-    return;
-  }
+  try {
+    let message: string;
+    if (userId) {
+      await update(userId, user);
+      message = "User is updated";
+    } else {
+      await create(user);
+      message = "User is created";
+    }
 
-  await createUser();
+    alert.open({
+      message,
+      variant: "success",
+      redirectTo: { name: "user" },
+    });
+  } catch (error) {
+    alert.open({
+      message: "User create/update is failed",
+      variant: "invalid",
+    });
+  } finally {
+    resetForm();
+  }
 }
 </script>
 
@@ -179,9 +133,7 @@ async function submit() {
             :to="{ name: 'user' }"
             class="text-md px-2 py-1 rounded bg-transparent text-black ml-auto"
           >
-            <div class="flex gap-x-1 items-center">
-              <span>Cancel</span>
-            </div>
+            <span>Cancel</span>
           </router-link>
           <button
             type="submit"
@@ -190,12 +142,11 @@ async function submit() {
               userId ? 'bg-indigo-400' : 'bg-emerald-400',
               'shadow',
               'px-2 py-1 rounded',
+              'flex gap-x-1 items-center',
             ]"
           >
-            <div class="flex gap-x-1 items-center">
-              <UiIcon icon="save" />
-              <span>{{ userId ? "Save changes" : "Save" }}</span>
-            </div>
+            <UiIcon icon="save" />
+            <span>{{ userId ? "Save changes" : "Save" }}</span>
           </button>
         </template>
       </UiForm>

@@ -1,42 +1,18 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { axiosOrigin } from "@/utils/useAxiosOrigin";
-import { AxiosError } from "axios";
-import { useAccessTokenStore } from "@/store/useAccessTokenStore";
 import { useDateIndo } from "@/utils/useDateIndo";
 import UiTable from "@/components/Ui/UiTable.vue";
 import UiTableActions from "@/components/Ui/UiTableActions.vue";
 import UiFormSearch from "@/components/Ui/UiFormSearch.vue";
 import UiTableAdd from "@/components/Ui/UiTableAdd.vue";
 import { useAlertStore } from "@/store/useAlertStore";
+import { index as UserIndex, type User } from "@/controllers/userController";
 
-interface Role {
-  id: number;
-  name: string;
-}
-
-interface Users {
-  id: number;
-  name: string;
-  role: Role;
-  email: string;
-  created_at: string;
-}
-// LOGIC
 const alert = useAlertStore();
-const users = ref<Users[]>([]);
-onMounted(async () => {
-  try {
-    const fetchUsers = await axiosOrigin.get("/user", {
-      headers: { Authorization: `Bearer ${useAccessTokenStore.value}` },
-    });
+const users = ref<User[] | undefined>(undefined);
 
-    users.value = fetchUsers.data.data;
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      console.error("Something went wrong");
-    }
-  }
+onMounted(async () => {
+  users.value = await UserIndex();
 });
 
 function handleDelete() {
@@ -66,14 +42,14 @@ function handleDelete() {
 
 <template>
   <section class="w-full">
-    <UiTable :source="users">
+    <UiTable :source="users ?? []">
       <template #cheader>
         <UiFormSearch
           id="search-user"
           name="search-user"
           placeholder="Search user"
         />
-        <UiTableAdd />
+        <UiTableAdd text="New user" :redirect-to="{ name: 'user.create' }" />
       </template>
       <template #thead>
         <th>
