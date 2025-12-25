@@ -2,13 +2,13 @@
 import { reactive } from "vue";
 import { Icon } from "@iconify/vue";
 
-import { axiosOrigin } from "../../utils/useAxiosOrigin";
+import { axiosOrigin } from "@/utils/useAxiosOrigin";
 
-import { useAccessTokenStore } from "../../store/useAccessTokenStore";
-import { useAlertStore } from "../../store/useAlertStore";
+import { useAccessTokenStore } from "@/store/useAccessTokenStore";
+import { useAlertStore } from "@/store/useAlertStore";
 
-import UiForm from "../../components/Ui/UiForm.vue";
-import UiFormInput from "../../components/Ui/UiFormInput.vue";
+import UiForm from "@/components/Ui/UiForm.vue";
+import UiFormInput from "@/components/Ui/UiFormInput.vue";
 
 const alert = useAlertStore();
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlobalAlert from "./components/Global/GlobalAlert.vue";
+import GlobalAlert from "@/components/Global/GlobalAlert.vue";
 </script>
 
 <template>

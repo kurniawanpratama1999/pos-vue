@@ -1,24 +1,32 @@
 <script setup lang="ts">
+/* IMPORT */
+//! modules
 import { onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { AxiosError } from "axios";
-import { useAlertStore } from "../../../store/useAlertStore";
-import { axiosOrigin } from "../../../utils/useAxiosOrigin";
-import UiFormInput from "../../../components/Ui/UiFormInput.vue";
-import UiIcon from "../../../components/Ui/UiIcon.vue";
-import UiForm from "../../../components/Ui/UiForm.vue";
+import { useAlertStore } from "@/store/useAlertStore";
+import { axiosOrigin } from "@/utils/useAxiosOrigin";
+import UiFormInput from "@/components/Ui/UiFormInput.vue";
+import UiIcon from "@/components/Ui/UiIcon.vue";
+import UiForm from "@/components/Ui/UiForm.vue";
+import UiFormSelect from "@/components/Ui/UiFormSelect.vue";
+
+interface Role {
+  id: string;
+  name: string;
+}
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  roleId: string | number;
+  roleId: string;
   roleName: string;
 }
 
 interface UserInput {
   name: string;
-  roleId: string | number;
+  roleId: string;
   email: string;
   password?: string;
   password_confirmation?: string;
@@ -27,6 +35,8 @@ interface UserInput {
 const route = useRoute();
 const alert = useAlertStore();
 const userId = ref<string | undefined>(undefined);
+
+const roles = ref<Role[] | undefined>(undefined);
 const user = reactive<UserInput>({
   name: "",
   roleId: "",
@@ -40,14 +50,17 @@ onMounted(async () => {
   userId.value = paramsId;
   try {
     if (userId.value) {
-      const getExistingUser = await axiosOrigin.get(`/user/${userId.value}`);
-      const data: User = getExistingUser.data.data;
+      const existingUser = await axiosOrigin.get(`/user/${userId.value}`);
+      const data: User = existingUser.data.data;
       Object.assign(user, {
         name: data.name,
         email: data.email,
         roleId: String(data.roleId),
       });
     }
+
+    const existingRole = await axiosOrigin.get("/role");
+    roles.value = existingRole.data.data;
   } catch (error) {}
 });
 
@@ -60,7 +73,7 @@ async function updateUser() {
   const send: UserInput = {
     name: user.name,
     email: user.email,
-    roleId: Number(user.roleId),
+    roleId: user.roleId,
   };
 
   if (user.password !== "") {
@@ -131,10 +144,11 @@ async function submit() {
             label="Full Name"
             :class-name="{ input: 'bg-neutral-100' }"
           />
-          <UiFormInput
-            v-model="user.roleId as string"
+          <UiFormSelect
+            v-model="user.roleId"
             id="roleId"
-            label="roleId"
+            label="Rolename"
+            :items="roles"
             :class-name="{ input: 'bg-neutral-100' }"
           />
           <UiFormInput

@@ -3,9 +3,9 @@ import {
   createWebHistory,
   type RouteRecordRaw,
 } from "vue-router";
-import { authRouter } from "./authRouter";
-import { dashRouter } from "./dashRouter";
-import { authenticate } from "../libs/Authenticate";
+import { authRouter } from "@/routes/authRouter";
+import { dashRouter } from "@/routes/dashRouter";
+import { authenticate } from "@/libs/Authenticate";
 
 const routes: RouteRecordRaw[] = [
   { path: "/", redirect: { name: "login" } },

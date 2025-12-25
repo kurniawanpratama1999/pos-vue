@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Props as AlertProps } from "../components/Ui/UiAlert.vue";
+import type { Props as AlertProps } from "@/components/Ui/UiAlert.vue";
 
 export const useAlertStore = defineStore("alert", {
   state: (): AlertProps => ({

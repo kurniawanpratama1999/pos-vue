@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { axiosOrigin } from "../../../utils/useAxiosOrigin";
+import { axiosOrigin } from "@/utils/useAxiosOrigin";
 import { AxiosError } from "axios";
-import { useAccessTokenStore } from "../../../store/useAccessTokenStore";
-import { useDateIndo } from "../../../utils/useDateIndo";
-import UiTable from "../../../components/Ui/UiTable.vue";
-import UiTableActions from "../../../components/Ui/UiTableActions.vue";
-import UiFormSearch from "../../../components/Ui/UiFormSearch.vue";
-import UiTableAdd from "../../../components/Ui/UiTableAdd.vue";
-import { useAlertStore } from "../../../store/useAlertStore";
+import { useAccessTokenStore } from "@/store/useAccessTokenStore";
+import { useDateIndo } from "@/utils/useDateIndo";
+import UiTable from "@/components/Ui/UiTable.vue";
+import UiTableActions from "@/components/Ui/UiTableActions.vue";
+import UiFormSearch from "@/components/Ui/UiFormSearch.vue";
+import UiTableAdd from "@/components/Ui/UiTableAdd.vue";
+import { useAlertStore } from "@/store/useAlertStore";
 
 interface Role {
   id: number;

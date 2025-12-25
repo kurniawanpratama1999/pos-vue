@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { useAlertStore } from "../../store/useAlertStore";
-import UiAlert from "../Ui/UiAlert.vue";
+import { useAlertStore } from "@/store/useAlertStore";
+import UiAlert from "@/components/Ui/UiAlert.vue";
 
 const alert = useAlertStore();
 const router = useRouter();
