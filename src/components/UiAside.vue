@@ -1,0 +1,69 @@
+<script setup lang="ts">
+import UiActiveLink from "./UiActiveLink.vue";
+import UiIcon from "./UiIcon.vue";
+</script>
+
+<template>
+  <aside class="fixed top-12 left-0 bottom-0 w-4xs bg-neutral-100 shadow z-99">
+    <nav class="p-3 space-y-5">
+      <!-- MASTER MENU -->
+      <div class="flex flex-col">
+        <h2
+          class="border-b-2 border-neutral-200 font-bold text-neutral-700 py-1 flex items-center gap-x-1">
+          <UiIcon icon="crown" />
+          Master Menu
+        </h2>
+        <ul class="flex flex-col py-1 space-y-1.5 list-disc pl-5 text-sm">
+          <li>
+            <UiActiveLink :to="{ name: 'user' }"> User </UiActiveLink>
+          </li>
+          <li>
+            <UiActiveLink :to="{ name: 'role' }"> Rolename </UiActiveLink>
+          </li>
+          <li class="list-none"></li>
+          <li>
+            <UiActiveLink :to="{ name: 'url' }"> Url </UiActiveLink>
+          </li>
+          <li>
+            <UiActiveLink :to="{ name: 'permission' }">
+              Permission
+            </UiActiveLink>
+          </li>
+        </ul>
+      </div>
+
+      <!-- General Menu -->
+      <div class="flex flex-col">
+        <h2
+          class="border-b-2 border-neutral-200 font-bold text-neutral-700 py-1 flex items-center gap-x-1">
+          <UiIcon icon="general" />
+          General Menu
+        </h2>
+        <ul class="flex flex-col py-1 space-y-1.5 list-disc pl-5 text-sm">
+          <li>
+            <UiActiveLink :to="{ name: 'product' }"> Product </UiActiveLink>
+          </li>
+          <li>
+            <UiActiveLink :to="{ name: 'variant' }">
+              Product Variant
+            </UiActiveLink>
+          </li>
+          <li>
+            <UiActiveLink :to="{ name: 'category' }">
+              Product Category
+            </UiActiveLink>
+          </li>
+          <li class="list-none"></li>
+          <li>
+            <UiActiveLink :to="{ name: 'discount' }"> Discount </UiActiveLink>
+          </li>
+          <li>
+            <UiActiveLink :to="{ name: 'condition' }">
+              Discount Condition
+            </UiActiveLink>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+</template>

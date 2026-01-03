@@ -1,4 +1,13 @@
+@import url("/fonts/font.css");
 @import "tailwindcss";
+
+@theme {
+  --container-4xs: 200px;
+
+  --default-font-family: "Poppins", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-google: "Google Sans", sans-serif;
+}
 
 html {
   background-color: var(--color-neutral-200);
@@ -6,6 +15,17 @@ html {
 
 button {
   cursor: pointer;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 @utility flex-center {

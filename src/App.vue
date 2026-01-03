@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import GlobalAlert from "@/components/Global/GlobalAlert.vue";
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <router-view />
-  <global-alert />
 </template>
