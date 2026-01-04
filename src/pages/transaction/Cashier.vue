@@ -3,8 +3,11 @@ import UiButton from "@/components/UiButton.vue";
 import UiFormControl from "@/components/UiFormControl.vue";
 import UiFormSelect from "@/components/UiFormSelect.vue";
 import UiIcon from "@/components/UiIcon.vue";
+import UiNavbar from "@/components/UiNavbar.vue";
+import Aside from "@/layouts/TransactionLayout/Aside.vue";
+import Header from "@/layouts/TransactionLayout/Header.vue";
 import { categories, products } from "@/store/dummyData";
-import { computed, ref, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 
 const searchProduct = ref<string>("");
 const searchCategory = ref<string>("");
@@ -105,11 +108,62 @@ const total = computed(() => {
   const taxStrToNumber = tax.value.replace(".", "");
   return numberToRupiah(Number(subtotalStrToNumber) + Number(taxStrToNumber));
 });
+
+const isAsideActive = ref<boolean>(false);
+const isCartActive = ref<boolean>(false);
+
+const handleAside = () => {
+  isAsideActive.value = !isAsideActive.value;
+};
+const handleCart = () => {
+  isCartActive.value = !isCartActive.value;
+};
+
+const handleClose = () => {
+  isAsideActive.value = false;
+};
+
+const productEl = useTemplateRef("productEl");
+const goTop = () => {
+  productEl.value?.scroll({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+const btnGoTop = ref<number>(0);
+const handleScroll = () => {
+  btnGoTop.value = productEl.value?.scrollTop ?? 0;
+};
 </script>
 
 <template>
-  <div class="grid grid-cols-[1fr_450px]">
-    <section class="h-[calc(100dvh-3rem)] overflow-y-auto overflow-x-hidden">
+  <Header :handleAside="() => handleAside()" :handleCart="() => handleCart()">
+    <UiNavbar class="max-lg:hidden" />
+  </Header>
+  <Aside :isAsideActive="isAsideActive" />
+  <Teleport to="body" v-if="isAsideActive">
+    <div
+      @click="handleClose"
+      :class="[
+        'backdrop fixed top-0 left-0 right-0 bottom-0 bg-black/5 z-99',
+      ]"></div>
+  </Teleport>
+
+  <Teleport to="body" v-if="btnGoTop > 100">
+    <button
+      type="button"
+      class="fixed size-10 flex-center bottom-5 left-5 bg-emerald-400 rounded-full -rotate-90 shadow"
+      @click="goTop">
+      <UiIcon icon="arrow" />
+    </button>
+  </Teleport>
+
+  <div class="grid lg:grid-cols-[1fr_450px]">
+    <section
+      @scroll="handleScroll()"
+      ref="productEl"
+      class="h-[calc(100dvh-3rem)] overflow-y-auto overflow-x-hidden">
       <div class="grid grid-cols-2 max-w-lg mx-auto gap-3 p-4">
         <UiFormControl
           v-model="searchProduct"
@@ -130,7 +184,7 @@ const total = computed(() => {
             [...categories].map((c) => ({ ...c, id: c.id.toString() }))
           " />
       </div>
-      <div class="grid grid-cols-2 gap-5 p-4">
+      <div class="grid lg:grid-cols-2 gap-5 p-4">
         <template v-for="(product, iProduct) in filterProduct" :key="iProduct">
           <div
             v-if="product.isActive"
@@ -152,7 +206,7 @@ const total = computed(() => {
                 ]">
                 {{ product.name }}
               </h2>
-              <p>{{ product.description }}</p>
+              <p class="line-clamp-2">{{ product.description }}</p>
               <div class="mt-auto py-2 flex items-center justify-between">
                 <p class="text-lg font-bold text-emerald-600 font-mono">
                   {{
@@ -196,7 +250,11 @@ const total = computed(() => {
 
     <!-- TRX -->
     <section
-      class="h-[calc(100dvh-3rem)] bg-neutral-100 shadow p-2 grid grid-rows-[auto_1fr_auto]">
+      :class="[
+        'max-lg:fixed max-lg:top-12 max-lg:w-full max-lg:bottom-0',
+        isCartActive ? 'max-lg:left-0' : 'max-lg:-left-full',
+        'lg:h-[calc(100dvh-3rem)] bg-neutral-100 shadow p-2 grid grid-rows-[auto_1fr_auto]',
+      ]">
       <div class="flex items-center mb-1">
         <table class="text-xs [&_td]:text-nowrap [&_td]:p-1 w-full">
           <thead>

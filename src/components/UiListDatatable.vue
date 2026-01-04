@@ -116,8 +116,8 @@ const toggleActions = (id: number, event?: MouseEvent) => {
               :key="`body-${iBody}`"
               :class="[
                 willActionActive == `action-${body.id}`
-                  ? 'italic font-bold text-amber-800'
-                  : 'has-checked:italic has-checked:font-bold has-checked:text-blue-800',
+                  ? 'italic font-bold text-indigo-700'
+                  : 'has-checked:italic has-checked:font-bold has-checked:text-amber-700',
                 'border-b-2 border-neutral-200 transition-all',
               ]">
               <td :class="'sticky left-0 bg-neutral-100 z-1'">

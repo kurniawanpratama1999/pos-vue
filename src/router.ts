@@ -14,7 +14,7 @@ import { discountRoute } from "./pages/discount/discount.route";
 import { conditionRoute } from "./pages/condition/condition.route";
 import { permissionRoute } from "./pages/permission/permission.route";
 
-import TransactionLayout from "./layouts/TransactionLayout.vue";
+import TransactionLayout from "./layouts/TransactionLayout/index.vue";
 import AuthLayout from "./layouts/AuthLayout.vue";
 import DashboardLayout from "./layouts/DashboardLayout.vue";
 
