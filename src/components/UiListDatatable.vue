@@ -103,7 +103,7 @@ const toggleActions = (id: number, event?: MouseEvent) => {
                 :key="`head-${iHead}`"
                 :class="[
                   iHead == 0
-                    ? 'border-r-2 border-neutral-200 sticky left-[50px] bg-neutral-100'
+                    ? 'border-r-2 border-neutral-200 lg:sticky lg:left-[50px] bg-neutral-100'
                     : 'border-0',
                 ]">
                 {{ head }}
@@ -116,9 +116,9 @@ const toggleActions = (id: number, event?: MouseEvent) => {
               :key="`body-${iBody}`"
               :class="[
                 willActionActive == `action-${body.id}`
-                  ? 'bg-neutral-300'
-                  : 'bg-transparent',
-                'border-b-2 border-neutral-200 has-checked:bg-black/10 has-checked:italic',
+                  ? 'italic font-bold text-amber-800'
+                  : 'has-checked:italic has-checked:font-bold has-checked:text-blue-800',
+                'border-b-2 border-neutral-200 transition-all',
               ]">
               <td :class="'sticky left-0 bg-neutral-100 z-1'">
                 <label :for="`check-${body.id}`" class="flex justify-center">
@@ -133,11 +133,8 @@ const toggleActions = (id: number, event?: MouseEvent) => {
                   v-if="key !== 'id'"
                   :key="`data-${body.id}`"
                   :class="[
-                    willActionActive == `action-${body.id}`
-                      ? 'bg-neutral-300'
-                      : 'bg-neutral-100',
                     index == 1
-                      ? 'border-r-2 border-neutral-200 sticky left-[50px] z-1'
+                      ? 'border-r-2 border-neutral-200 lg:sticky lg:left-[50px] lg:z-1'
                       : 'border-0',
                   ]">
                   <div class="grid grid-cols-[1fr_auto] gap-x-2 relative">
