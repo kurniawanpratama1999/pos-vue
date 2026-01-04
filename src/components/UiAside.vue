@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import UiActiveLink from "./UiActiveLink.vue";
 import UiIcon from "./UiIcon.vue";
+
+interface Props {
+  isAsideActive?: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+  isAsideActive: false,
+});
 </script>
 
 <template>
-  <aside class="fixed top-12 left-0 bottom-0 w-4xs bg-neutral-100 shadow z-99">
+  <aside
+    :class="[
+      'fixed top-12',
+      isAsideActive ? 'left-0' : '-left-(--container-4xs) lg:left-0',
+      'bottom-0 w-4xs bg-neutral-100 shadow z-100',
+    ]">
     <nav class="p-3 space-y-5">
       <!-- MASTER MENU -->
       <div class="flex flex-col">

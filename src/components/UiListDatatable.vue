@@ -19,6 +19,7 @@ const props = defineProps<PropsListDatatable>();
 const isActionActive = ref<boolean>(false);
 const setActionPosition = reactive<{ x: number; y: number }>({ x: 0, y: 0 });
 const willActionActive = ref<string | false>(false);
+
 const actionPosition = (event: MouseEvent) => {
   console.log(event.clientX);
   setActionPosition.y = event.clientY;
