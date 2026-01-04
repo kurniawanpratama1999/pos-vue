@@ -195,20 +195,31 @@ const handleScroll = () => {
                 ? 'border-l-4 border-amber-500'
                 : 'border-l-4 border-transparent hover:border-emerald-400',
             ]">
+            <!-- PHOTO -->
             <div
               @click="increment(product.id)"
-              class="min-h-32 max-h-32 min-w-32 max-w-32 rounded bg-neutral-300 cursor-pointer"></div>
+              :class="[
+                'min-h-32 max-h-32 min-w-32 max-w-32',
+                'max-sm:min-h-28 max-sm:max-h-28 max-sm:min-w-28 max-sm:max-w-28',
+                'rounded bg-neutral-300 cursor-pointer',
+              ]"></div>
+
+            <!-- CONTENT -->
             <div class="flex flex-col w-full">
               <h2
                 :class="[
-                  'text-lg font-bold',
+                  'text-lg font-bold max-sm:text-sm',
                   product.quantity > 0 ? 'text-amber-600' : 'text-black',
                 ]">
                 {{ product.name }}
               </h2>
-              <p class="line-clamp-2">{{ product.description }}</p>
-              <div class="mt-auto py-2 flex items-center justify-between">
-                <p class="text-lg font-bold text-emerald-600 font-mono">
+              <p class="line-clamp-2 max-sm:text-xs">
+                {{ product.description }}
+              </p>
+              <div
+                class="mt-auto py-2 flex items-end sm:items-center justify-between max-sm:flex-col">
+                <p
+                  class="text-lg max-sm:text-sm font-bold text-emerald-600 font-mono">
                   {{
                     new Intl.NumberFormat("id-ID", {
                       style: "currency",
@@ -219,7 +230,7 @@ const handleScroll = () => {
                 </p>
 
                 <div
-                  class="flex items-center gap-x-2 rounded bg-neutral-300/30 px-3">
+                  class="flex items-center gap-x-2 rounded bg-neutral-300/30 px-3 max-sm:text-sm">
                   <button
                     @click="decrement(product.id)"
                     class="text-xl font-bold text-red-500">
@@ -252,7 +263,7 @@ const handleScroll = () => {
     <section
       :class="[
         'max-lg:fixed max-lg:top-12 max-lg:w-full max-lg:bottom-0',
-        isCartActive ? 'max-lg:left-0' : 'max-lg:-left-full',
+        isCartActive ? 'max-lg:left-0' : 'max-lg:hidden',
         'lg:h-[calc(100dvh-3rem)] bg-neutral-100 shadow p-2 grid grid-rows-[auto_1fr_auto]',
       ]">
       <div class="flex items-center mb-1">
@@ -262,14 +273,14 @@ const handleScroll = () => {
               <th></th>
               <th class="w-full"></th>
 
-              <th></th>
-              <th></th>
+              <th class="max-sm:hidden"></th>
+              <th class="max-sm:hidden"></th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Running ID</td>
-              <td>: 1234567890</td>
+              <td class="max-sm:hidden">Running ID</td>
+              <td class="max-sm:hidden">: 1234567890</td>
 
               <td>Cashier</td>
               <td>: Kurniawan Pratama</td>
@@ -277,8 +288,8 @@ const handleScroll = () => {
             <tr>
               <td>Date Now</td>
               <td>: 01 Januari 2026</td>
-              <td>Employee ID</td>
-              <td>: 1234567890</td>
+              <td class="max-sm:hidden">Employee ID</td>
+              <td class="max-sm:hidden">: 1234567890</td>
             </tr>
           </tbody>
         </table>
