@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
       </div>
 
       <!-- Navbar Menu -->
-      <div class="flex flex-col">
+      <div class="flex flex-col lg:hidden">
         <h2
           class="border-b-2 border-neutral-200 font-bold text-neutral-700 py-1 flex items-center gap-x-1">
           <UiIcon icon="general" />
