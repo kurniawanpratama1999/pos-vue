@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import UiListDatatable from "@/components/UiListDatatable.vue";
-import { roles } from "@/store/dummyData";
+import { useInterceptor } from "@/composables/useInterceptor";
+import { onMounted, ref } from "vue";
+
+const roles = ref([]);
+onMounted(async () => {
+  const response = await useInterceptor.get("/role");
+  roles.value = response.data.data;
+});
 </script>
 
 <template>

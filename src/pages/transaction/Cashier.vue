@@ -19,7 +19,6 @@ const copiedProduct = products.map((p: any) => ({
   isActive: true,
 }));
 const filterProduct = ref<any>(copiedProduct);
-
 watch(
   [searchProduct, searchCategory],
   (items) => {

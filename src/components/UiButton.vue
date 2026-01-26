@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, type ButtonHTMLAttributes } from "vue";
 import { RouterLink, type RouteLocationRaw } from "vue-router";
 
 const VARIANT_CLASS = {
@@ -59,6 +59,7 @@ interface PropsButton {
   variant?: keyof typeof VARIANT_CLASS;
   color?: keyof typeof COLOR_CLASS;
   className?: string;
+  buttonType?: ButtonHTMLAttributes["type"];
   to?: RouteLocationRaw;
   icon?: {
     name: string;
@@ -69,6 +70,7 @@ const props = withDefaults(defineProps<PropsButton>(), {
   variant: "rounded",
   color: "green",
   className: "",
+  buttonType: "button",
 });
 
 const baseClass = computed(
@@ -88,7 +90,7 @@ const colorClass = computed(() => COLOR_CLASS?.[props.color]?.[props.variant]);
   ></RouterLink>
   <button
     v-else
-    type="button"
+    :type="buttonType"
     :class="[baseClass, variantClass, colorClass, className]"
     v-bind="$attrs">
     <slot></slot>

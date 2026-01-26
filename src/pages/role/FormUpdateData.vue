@@ -2,12 +2,16 @@
 import UiButton from "@/components/UiButton.vue";
 import UiFormControl from "@/components/UiFormControl.vue";
 import UiFormUpdateData from "@/components/UiFormUpdateData.vue";
-import { reactive } from "vue";
+import { onBeforeMount, reactive } from "vue";
 
 const props = defineProps<{ id?: string }>();
 
 const role = reactive<{ name: string }>({
   name: "",
+});
+
+onBeforeMount(() => {
+  console.log(window.location.pathname);
 });
 </script>
 
